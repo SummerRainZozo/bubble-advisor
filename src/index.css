@@ -48,56 +48,51 @@ All colors MUST be HSL.
     --sidebar-ring: 217.2 91.2% 59.8%;
     
     /* Bubble theme colors */
-    --bubble-primary: 25 95% 53%;
-    --bubble-glow: 25 95% 65%;
-    --bubble-dark: 220 26% 14%;
-    --bubble-darker: 220 30% 10%;
-    --bubble-card: 220 26% 16%;
-    --bubble-border: 220 20% 25%;
-    --bubble-text: 0 0% 85%;
-    --bubble-text-muted: 220 10% 55%;
+    --bubble-primary: 262 83% 58%;
+    --bubble-glow: 262 83% 70%;
+    --bubble-secondary: 220 83% 58%;
     --bubble-danger: 0 72% 51%;
     --bubble-warning: 38 92% 50%;
     --bubble-success: 142 71% 45%;
   }
 
   .dark {
-    --background: 220 26% 14%;
-    --foreground: 0 0% 85%;
+    --background: 222 15% 11%;
+    --foreground: 210 20% 96%;
 
-    --card: 220 26% 16%;
-    --card-foreground: 0 0% 85%;
+    --card: 222 15% 13%;
+    --card-foreground: 210 20% 96%;
 
-    --popover: 220 26% 16%;
-    --popover-foreground: 0 0% 85%;
+    --popover: 222 15% 13%;
+    --popover-foreground: 210 20% 96%;
 
-    --primary: 25 95% 53%;
-    --primary-foreground: 220 30% 10%;
+    --primary: 262 83% 58%;
+    --primary-foreground: 210 20% 98%;
 
-    --secondary: 220 20% 25%;
-    --secondary-foreground: 0 0% 85%;
+    --secondary: 222 15% 18%;
+    --secondary-foreground: 210 20% 96%;
 
-    --muted: 220 20% 25%;
-    --muted-foreground: 220 10% 55%;
+    --muted: 222 15% 18%;
+    --muted-foreground: 215 15% 65%;
 
-    --accent: 25 95% 53%;
-    --accent-foreground: 220 30% 10%;
+    --accent: 262 83% 58%;
+    --accent-foreground: 210 20% 98%;
 
     --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 85%;
+    --destructive-foreground: 210 20% 96%;
 
-    --border: 220 20% 25%;
-    --input: 220 20% 25%;
-    --ring: 25 95% 53%;
+    --border: 222 15% 22%;
+    --input: 222 15% 22%;
+    --ring: 262 83% 58%;
     
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 222 15% 11%;
+    --sidebar-foreground: 210 20% 96%;
+    --sidebar-primary: 262 83% 58%;
+    --sidebar-primary-foreground: 210 20% 98%;
+    --sidebar-accent: 222 15% 18%;
+    --sidebar-accent-foreground: 210 20% 96%;
+    --sidebar-border: 222 15% 22%;
+    --sidebar-ring: 262 83% 58%;
   }
 }
 
@@ -113,14 +108,14 @@ All colors MUST be HSL.
 
 @layer utilities {
   .bubble-glow {
-    box-shadow: 0 0 40px hsl(var(--bubble-glow) / 0.3),
-                0 0 80px hsl(var(--bubble-glow) / 0.15),
-                inset 0 0 40px hsl(var(--bubble-glow) / 0.1);
+    box-shadow: 0 0 30px hsl(var(--bubble-glow) / 0.4),
+                0 0 60px hsl(var(--bubble-glow) / 0.2),
+                0 0 100px hsl(var(--bubble-glow) / 0.1);
   }
   
   .bubble-glow-strong {
-    box-shadow: 0 0 60px hsl(var(--bubble-glow) / 0.5),
-                0 0 120px hsl(var(--bubble-glow) / 0.25),
-                inset 0 0 60px hsl(var(--bubble-glow) / 0.2);
+    box-shadow: 0 0 40px hsl(var(--bubble-glow) / 0.6),
+                0 0 80px hsl(var(--bubble-glow) / 0.3),
+                0 0 120px hsl(var(--bubble-glow) / 0.15);
   }
 }

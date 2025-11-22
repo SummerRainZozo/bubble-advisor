@@ -60,12 +60,7 @@ export default {
         bubble: {
           primary: "hsl(var(--bubble-primary))",
           glow: "hsl(var(--bubble-glow))",
-          dark: "hsl(var(--bubble-dark))",
-          darker: "hsl(var(--bubble-darker))",
-          card: "hsl(var(--bubble-card))",
-          border: "hsl(var(--bubble-border))",
-          text: "hsl(var(--bubble-text))",
-          "text-muted": "hsl(var(--bubble-text-muted))",
+          secondary: "hsl(var(--bubble-secondary))",
           danger: "hsl(var(--bubble-danger))",
           warning: "hsl(var(--bubble-warning))",
           success: "hsl(var(--bubble-success))",

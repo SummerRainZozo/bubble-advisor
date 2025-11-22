@@ -33,21 +33,22 @@ export const BubbleVisualization = ({
   }, [score, prevScore]);
 
   const getBurstRisk = (score: number) => {
-    if (score >= 85) return { label: "CRITICAL", color: "text-bubble-danger" };
-    if (score >= 70) return { label: "HIGH", color: "text-bubble-warning" };
-    if (score >= 50) return { label: "MODERATE", color: "text-bubble-warning" };
+    if (score >= 80) return { label: "CRITICAL", color: "text-bubble-danger" };
+    if (score >= 65) return { label: "HIGH", color: "text-bubble-warning" };
+    if (score >= 45) return { label: "MODERATE", color: "text-yellow-500" };
     return { label: "LOW", color: "text-bubble-success" };
   };
 
   const getTimeEstimate = (score: number) => {
-    if (score >= 85) return "< 30 days";
-    if (score >= 70) return "30-90 days";
-    if (score >= 50) return "90+ days";
+    if (score >= 80) return "< 30 days";
+    if (score >= 65) return "30-90 days";
+    if (score >= 45) return "90-180 days";
     return "12+ months";
   };
 
   const risk = getBurstRisk(score);
-  const bubbleSize = Math.max(120, Math.min(280, 120 + (score * 1.6)));
+  const cappedScore = Math.min(score, 100);
+  const bubbleSize = Math.max(140, Math.min(320, 140 + (cappedScore * 1.8)));
 
   return (
     <div className="relative flex flex-col items-center justify-between h-full p-8">
@@ -85,56 +86,93 @@ export const BubbleVisualization = ({
               height: bubbleSize,
             }}
           >
-            {/* Outer glow */}
-            <div 
+            {/* Outer glow effect */}
+            <motion.div 
               className="absolute inset-0 rounded-full bubble-glow-strong"
-              style={{
-                background: `radial-gradient(circle at 30% 30%, 
-                  hsl(var(--bubble-glow) / 0.6) 0%, 
-                  hsl(var(--bubble-primary) / 0.4) 40%, 
-                  transparent 70%)`,
+              animate={{
+                scale: [1, 1.08, 1],
+                opacity: [0.6, 0.8, 0.6],
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                ease: "easeInOut",
               }}
             />
             
-            {/* Main bubble */}
+            {/* Main bubble with gradient */}
             <div 
-              className="absolute inset-0 rounded-full border-4 border-primary/30 backdrop-blur-sm"
+              className="absolute inset-0 rounded-full border-2 border-primary/20 backdrop-blur-md overflow-hidden"
               style={{
-                background: `radial-gradient(circle at 35% 35%, 
-                  hsl(var(--bubble-glow) / 0.3) 0%, 
-                  hsl(var(--bubble-primary) / 0.2) 50%, 
-                  hsl(var(--bubble-primary) / 0.1) 100%)`,
+                background: `radial-gradient(circle at 30% 30%, 
+                  hsl(var(--bubble-glow) / 0.35) 0%, 
+                  hsl(var(--bubble-primary) / 0.25) 30%,
+                  hsl(var(--bubble-secondary) / 0.15) 60%, 
+                  hsl(var(--bubble-primary) / 0.08) 100%)`,
               }}
             >
-              {/* Highlight */}
-              <div 
-                className="absolute top-8 left-8 w-16 h-16 rounded-full"
+              {/* Primary highlight */}
+              <motion.div 
+                className="absolute top-6 left-6 w-20 h-20 rounded-full"
                 style={{
                   background: `radial-gradient(circle, 
-                    rgba(255, 255, 255, 0.4) 0%, 
+                    rgba(255, 255, 255, 0.5) 0%, 
+                    rgba(255, 255, 255, 0.2) 40%,
                     transparent 70%)`,
+                }}
+                animate={{
+                  scale: [1, 1.1, 1],
+                  opacity: [0.6, 0.8, 0.6],
+                }}
+                transition={{
+                  duration: 2.5,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              />
+
+              {/* Secondary highlight */}
+              <motion.div 
+                className="absolute bottom-12 right-12 w-12 h-12 rounded-full"
+                style={{
+                  background: `radial-gradient(circle, 
+                    rgba(255, 255, 255, 0.3) 0%, 
+                    transparent 60%)`,
+                }}
+                animate={{
+                  scale: [1, 1.15, 1],
+                  opacity: [0.4, 0.6, 0.4],
+                }}
+                transition={{
+                  duration: 3.5,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 0.5,
                 }}
               />
               
               {/* Floating particles */}
-              {[...Array(3)].map((_, i) => (
+              {[...Array(5)].map((_, i) => (
                 <motion.div
                   key={i}
-                  className="absolute w-2 h-2 rounded-full bg-primary/40"
+                  className="absolute rounded-full bg-primary/30"
                   style={{
-                    top: `${20 + i * 25}%`,
-                    left: `${60 + i * 10}%`,
+                    width: `${4 + i * 2}px`,
+                    height: `${4 + i * 2}px`,
+                    top: `${15 + i * 18}%`,
+                    left: `${55 + i * 8}%`,
                   }}
                   animate={{
-                    y: [-10, 10, -10],
-                    x: [-5, 5, -5],
-                    opacity: [0.2, 0.5, 0.2],
+                    y: [-15, 15, -15],
+                    x: [-8, 8, -8],
+                    opacity: [0.3, 0.7, 0.3],
+                    scale: [1, 1.2, 1],
                   }}
                   transition={{
-                    duration: 3 + i,
+                    duration: 3.5 + i * 0.5,
                     repeat: Infinity,
                     ease: "easeInOut",
-                    delay: i * 0.5,
+                    delay: i * 0.3,
                   }}
                 />
               ))}
@@ -142,15 +180,21 @@ export const BubbleVisualization = ({
               {/* Score display */}
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <motion.div
-                  className="text-5xl font-bold text-primary"
-                  animate={{ scale: [1, 1.05, 1] }}
+                  className="text-6xl font-bold bg-gradient-to-br from-primary to-bubble-secondary bg-clip-text text-transparent"
+                  animate={{ 
+                    scale: [1, 1.03, 1],
+                  }}
                   transition={{ duration: 2, repeat: Infinity }}
                 >
-                  {Math.round(score)}
+                  {Math.round(cappedScore)}
                 </motion.div>
-                <div className="text-xs text-primary/70 uppercase tracking-wider mt-1">
+                <motion.div 
+                  className="text-xs text-foreground/60 uppercase tracking-wider mt-2 font-medium"
+                  animate={{ opacity: [0.6, 1, 0.6] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
                   Bubble Index
-                </div>
+                </motion.div>
               </div>
             </div>
           </motion.div>
@@ -158,17 +202,17 @@ export const BubbleVisualization = ({
       </div>
 
       <div className="w-full space-y-3 mt-8">
-        <div className="flex justify-between items-center">
-          <span className="text-muted-foreground text-sm">Bubble Size:</span>
-          <span className="text-xl font-bold text-primary">{score.toFixed(1)}%</span>
+        <div className="flex justify-between items-center py-2 border-b border-border/50">
+          <span className="text-muted-foreground text-sm font-medium">Bubble Size:</span>
+          <span className="text-2xl font-bold text-primary">{cappedScore.toFixed(1)}%</span>
         </div>
-        <div className="flex justify-between items-center">
-          <span className="text-muted-foreground text-sm">Burst Risk:</span>
+        <div className="flex justify-between items-center py-2 border-b border-border/50">
+          <span className="text-muted-foreground text-sm font-medium">Burst Risk:</span>
           <span className={`text-lg font-bold ${risk.color}`}>{risk.label}</span>
         </div>
-        <div className="flex justify-between items-center">
-          <span className="text-muted-foreground text-sm">Est. Time to Burst:</span>
-          <span className="text-base font-medium text-foreground">{getTimeEstimate(score)}</span>
+        <div className="flex justify-between items-center py-2">
+          <span className="text-muted-foreground text-sm font-medium">Est. Time to Burst:</span>
+          <span className="text-base font-semibold text-foreground">{getTimeEstimate(cappedScore)}</span>
         </div>
       </div>
     </div>
