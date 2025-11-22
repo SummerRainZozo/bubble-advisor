@@ -190,14 +190,20 @@ const Index = () => {
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Market Consensus Bubble */}
           <Card
-            className="p-8 bg-card border-border cursor-pointer hover:border-primary/50 transition-colors"
-            onClick={() => navigate("/market-consensus")}
+            className="p-8 bg-card border-border hover:border-primary/50 transition-colors overflow-hidden"
           >
-            <BubbleVisualization
-              score={marketScore}
-              title="Market Consensus"
-              subtitle="Algorithm reflecting real-time market factors"
-            />
+            <div onClick={() => navigate("/market-consensus")} className="cursor-pointer">
+              <BubbleVisualization
+                score={marketScore}
+                title="Market Consensus"
+                subtitle="Algorithm reflecting real-time market factors"
+              />
+            </div>
+            <div className="mt-6 pt-6 border-t border-border/50">
+              <p className="text-sm text-muted-foreground/90 leading-relaxed">
+                Market consensus reflects elevated valuations and strong sentiment across AI stocks. High scores in Sentiment & Hype (85%+) and Market Valuation (78%+) indicate significant bubble risk.
+              </p>
+            </div>
           </Card>
 
           {/* User Analysis Bubble */}
