@@ -12,7 +12,9 @@ const Index = () => {
   const calculateScore = (cats: Category[], useUserWeights: boolean = false) => {
     return cats.reduce((total, category) => {
       const categoryScore = category.indexes.reduce((sum, index) => {
-        return sum + (index.value * index.marketWeight / 100);
+        // Use userValue if available (advanced mode), otherwise use default value
+        const indexValue = useUserWeights && index.userValue !== undefined ? index.userValue : index.value;
+        return sum + (indexValue * index.marketWeight / 100);
       }, 0);
       
       const weight = useUserWeights ? category.userWeight / 100 : 1;
@@ -27,15 +29,66 @@ const Index = () => {
 
   const handleCategoryWeightChange = (categoryId: string, weight: number) => {
     setCategories((prev) =>
-      prev.map((cat) =>
-        cat.id === categoryId ? { ...cat, userWeight: weight } : cat
-      )
+      prev.map((cat) => {
+        if (cat.id === categoryId) {
+          // In normal mode, update category weight and proportionally scale all indexes
+          const scaleFactor = weight / cat.userWeight;
+          return {
+            ...cat,
+            userWeight: weight,
+            indexes: cat.indexes.map(idx => ({
+              ...idx,
+              userValue: idx.userValue !== undefined 
+                ? idx.userValue * scaleFactor 
+                : idx.value * scaleFactor
+            }))
+          };
+        }
+        return cat;
+      })
+    );
+  };
+
+  const handleIndexValueChange = (categoryId: string, indexId: string, value: number) => {
+    setCategories((prev) =>
+      prev.map((cat) => {
+        if (cat.id === categoryId) {
+          // Update the specific index value
+          const updatedIndexes = cat.indexes.map(idx =>
+            idx.id === indexId ? { ...idx, userValue: value } : idx
+          );
+          
+          // Recalculate category weight based on new index values
+          const marketCategoryScore = cat.indexes.reduce((sum, idx) => 
+            sum + (idx.value * idx.marketWeight / 100), 0
+          );
+          const userCategoryScore = updatedIndexes.reduce((sum, idx) => 
+            sum + ((idx.userValue ?? idx.value) * idx.marketWeight / 100), 0
+          );
+          
+          // Calculate new category weight as percentage of market score
+          const newWeight = marketCategoryScore > 0 
+            ? (userCategoryScore / marketCategoryScore) * 100 
+            : 100;
+          
+          return {
+            ...cat,
+            indexes: updatedIndexes,
+            userWeight: Math.max(0, Math.min(200, newWeight))
+          };
+        }
+        return cat;
+      })
     );
   };
 
   const handleReset = () => {
     setCategories(
-      CATEGORIES.map((cat) => ({ ...cat, userWeight: 100 }))
+      CATEGORIES.map((cat) => ({
+        ...cat,
+        userWeight: 100,
+        indexes: cat.indexes.map(idx => ({ ...idx, userValue: undefined }))
+      }))
     );
   };
 
@@ -85,6 +138,7 @@ const Index = () => {
           <CategoryControls
             categories={categories}
             onCategoryWeightChange={handleCategoryWeightChange}
+            onIndexValueChange={handleIndexValueChange}
             onReset={handleReset}
           />
         </div>
