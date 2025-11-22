@@ -31,8 +31,8 @@ export const BubbleTrendChart = ({ currentScore }: BubbleTrendChartProps) => {
       });
     }
     
-    // Future projection (next 12 months) - showing potential paths
-    for (let i = 1; i <= 12; i++) {
+    // Future projection (next 24 months) - showing potential paths
+    for (let i = 1; i <= 24; i++) {
       const date = new Date();
       date.setMonth(date.getMonth() + i);
       const monthLabel = date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
@@ -40,17 +40,17 @@ export const BubbleTrendChart = ({ currentScore }: BubbleTrendChartProps) => {
       // Projection depends on current score
       let projectedScore;
       if (currentScore >= 85) {
-        // High risk: sharp decline expected
-        projectedScore = Math.max(25, currentScore - (i * (currentScore - 25) / 8));
+        // High risk: sharp decline expected within 6-12 months
+        projectedScore = Math.max(30, currentScore - (i * (currentScore - 30) / 10));
       } else if (currentScore >= 70) {
-        // Elevated: moderate growth then correction
-        projectedScore = currentScore + Math.min(15, i * 2) - Math.pow(i - 6, 2) * 0.3;
+        // Elevated: continued growth then correction
+        projectedScore = currentScore + Math.min(10, i * 1.2) - Math.pow(Math.max(0, i - 8), 2) * 0.4;
       } else if (currentScore >= 50) {
-        // Moderate: continued growth with slowdown
-        projectedScore = currentScore + (12 - i) * 1.5;
+        // Moderate: steady growth with eventual plateau
+        projectedScore = currentScore + (18 - i) * 0.8;
       } else {
-        // Low: steady growth
-        projectedScore = currentScore + i * 2.5;
+        // Low: steady growth potential
+        projectedScore = Math.min(85, currentScore + i * 1.8);
       }
       
       data.push({
@@ -90,7 +90,7 @@ export const BubbleTrendChart = ({ currentScore }: BubbleTrendChartProps) => {
         <div className="mb-6">
           <h3 className="text-2xl font-bold text-primary mb-2">AI Bubble Trend Analysis</h3>
           <p className="text-muted-foreground text-sm">
-            Historical trend and projected trajectory based on current market indicators
+            12-month historical trend and 24-month projected trajectory based on current indicators
           </p>
         </div>
 
@@ -182,7 +182,7 @@ export const BubbleTrendChart = ({ currentScore }: BubbleTrendChartProps) => {
                 data={data.slice(0, currentIndex + 1)}
               />
               
-              {/* Projected line (dashed) */}
+              {/* Projected line (dashed) - starts from current point */}
               <Line 
                 type="monotone" 
                 dataKey="score" 
@@ -191,7 +191,7 @@ export const BubbleTrendChart = ({ currentScore }: BubbleTrendChartProps) => {
                 strokeDasharray="8 4"
                 dot={false}
                 opacity={0.6}
-                data={data.slice(currentIndex)}
+                data={[data[currentIndex], ...data.slice(currentIndex + 1)]}
               />
               
               {/* Current position dot */}
@@ -227,14 +227,14 @@ export const BubbleTrendChart = ({ currentScore }: BubbleTrendChartProps) => {
             <div className="w-8 h-0.5 bg-primary mt-2"></div>
             <div>
               <div className="font-semibold text-foreground">Historical Data</div>
-              <div className="text-muted-foreground text-xs">Past 12 months actual trend</div>
+              <div className="text-muted-foreground text-xs">Past 12 months</div>
             </div>
           </div>
           <div className="flex items-start gap-2">
             <div className="w-8 h-0.5 border-t-2 border-dashed border-primary mt-2 opacity-60"></div>
             <div>
-              <div className="font-semibold text-foreground">Projection</div>
-              <div className="text-muted-foreground text-xs">Estimated future trajectory</div>
+              <div className="font-semibold text-foreground">24-Month Projection</div>
+              <div className="text-muted-foreground text-xs">Forward-looking trajectory</div>
             </div>
           </div>
           <div className="flex items-start gap-2">

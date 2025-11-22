@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { BubbleVisualization } from "@/components/BubbleVisualization";
 import { BubbleTrendChart } from "@/components/BubbleTrendChart";
-import { CategoryControls } from "@/components/CategoryControls";
+import { MarketFactorsReadOnly } from "@/components/MarketFactorsReadOnly";
 import { CATEGORIES, Category } from "@/types/bubble";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -82,15 +82,9 @@ const MarketConsensus = () => {
           <BubbleTrendChart currentScore={marketScore} />
         </div>
 
-        {/* Market Factors - Read Only */}
+        {/* Market Factors - Read Only with Educational Content */}
         <div>
-          <CategoryControls
-            categories={categories}
-            onCategoryWeightChange={() => {}} // No-op for market consensus
-            onIndexValueChange={() => {}} // No-op for market consensus
-            onReset={() => {}} // No-op for market consensus
-            readOnly
-          />
+          <MarketFactorsReadOnly categories={categories} />
         </div>
       </div>
     </div>
