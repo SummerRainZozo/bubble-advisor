@@ -34,11 +34,22 @@ const UserAnalysis = () => {
     let totalWeight = 0;
     
     cats.forEach(category => {
-      const categoryScore = category.indexes.reduce((sum, index) => {
-        // In normal mode, always use market values. In advanced mode, use user values if set
-        const indexValue = useAdvancedValues && index.userValue !== undefined ? index.userValue : index.value;
-        return sum + indexValue;
-      }, 0) / category.indexes.length;
+      let categoryScore;
+      
+      if (useAdvancedValues) {
+        // Advanced mode: calculate from individual factor values
+        categoryScore = category.indexes.reduce((sum, index) => {
+          const indexValue = index.userValue !== undefined ? index.userValue : index.value;
+          return sum + indexValue;
+        }, 0) / category.indexes.length;
+      } else {
+        // Normal mode: use direct category score if set, otherwise use market values
+        if (category.userCategoryScore !== undefined) {
+          categoryScore = category.userCategoryScore;
+        } else {
+          categoryScore = category.indexes.reduce((sum, index) => sum + index.value, 0) / category.indexes.length;
+        }
+      }
       
       // Weight contribution: category score multiplied by weight
       totalScore += categoryScore * category.userWeight;
@@ -82,6 +93,20 @@ const UserAnalysis = () => {
     );
   };
 
+  const handleCategoryScoreChange = (categoryId: string, score: number) => {
+    setCategories((prev) =>
+      prev.map((cat) => {
+        if (cat.id === categoryId) {
+          return {
+            ...cat,
+            userCategoryScore: score,
+          };
+        }
+        return cat;
+      })
+    );
+  };
+
   const handleIndexValueChange = (categoryId: string, indexId: string, value: number) => {
     setCategories((prev) =>
       prev.map((cat) => {
@@ -103,6 +128,7 @@ const UserAnalysis = () => {
       CATEGORIES.map((cat) => ({
         ...cat,
         userWeight: cat.marketWeight,
+        userCategoryScore: undefined,
         indexes: cat.indexes.map(idx => ({ ...idx, userValue: undefined }))
       }))
     );
@@ -174,6 +200,7 @@ const UserAnalysis = () => {
           <CategoryControls
             categories={categories}
             onCategoryWeightChange={handleCategoryWeightChange}
+            onCategoryScoreChange={handleCategoryScoreChange}
             onIndexValueChange={handleIndexValueChange}
             onReset={handleReset}
             isAdvancedMode={isAdvancedMode}

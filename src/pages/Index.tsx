@@ -20,11 +20,22 @@ const Index = () => {
       let totalWeight = 0;
       
       cats.forEach(category => {
-        const categoryScore = category.indexes.reduce((sum, index) => {
-          // In normal mode, always use market values. In advanced mode, use user values if set
-          const indexValue = isAdvancedMode && index.userValue !== undefined ? index.userValue : index.value;
-          return sum + indexValue;
-        }, 0) / category.indexes.length;
+        let categoryScore;
+        
+        if (isAdvancedMode) {
+          // Advanced mode: calculate from individual factor values
+          categoryScore = category.indexes.reduce((sum, index) => {
+            const indexValue = index.userValue !== undefined ? index.userValue : index.value;
+            return sum + indexValue;
+          }, 0) / category.indexes.length;
+        } else {
+          // Normal mode: use direct category score if set, otherwise use market values
+          if (category.userCategoryScore !== undefined) {
+            categoryScore = category.userCategoryScore;
+          } else {
+            categoryScore = category.indexes.reduce((sum, index) => sum + index.value, 0) / category.indexes.length;
+          }
+        }
         
         totalScore += categoryScore * category.userWeight;
         totalWeight += category.userWeight;
