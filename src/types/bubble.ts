@@ -13,7 +13,8 @@ export interface Category {
   name: string;
   description: string;
   indexes: Index[];
-  userWeight: number; // 0-200, default 100 (market consensus)
+  userWeight: number; // User's custom weight 0-100
+  marketWeight: number; // Market consensus weight 0-100
   explanation: string; // What this category means and current market implications
 }
 
@@ -23,7 +24,8 @@ export const CATEGORIES: Category[] = [
     name: "Market Valuation",
     description: "Price metrics vs historical norms",
     explanation: "Market valuation measures how expensive AI stocks are relative to their earnings and revenue. High valuations (85%+) suggest investors are pricing in significant future growth, potentially creating bubble conditions if expectations aren't met. Current market consensus shows elevated valuations near historical peaks, indicating strong optimism but also increased risk.",
-    userWeight: 100,
+    marketWeight: 25,
+    userWeight: 25,
     indexes: [
       {
         id: "pe-ratio",
@@ -64,7 +66,8 @@ export const CATEGORIES: Category[] = [
     name: "Sentiment & Hype",
     description: "Market excitement and media coverage",
     explanation: "Sentiment measures the emotional and psychological enthusiasm around AI investments. Extremely high sentiment (90%+) often precedes corrections as hype exceeds reality. Current levels show strong excitement with media coverage near peak levels, suggesting we're in the euphoric phase where retail participation surges.",
-    userWeight: 100,
+    marketWeight: 20,
+    userWeight: 20,
     indexes: [
       {
         id: "media-mentions",
@@ -113,7 +116,8 @@ export const CATEGORIES: Category[] = [
     name: "Positioning & Flows",
     description: "Investor positioning and capital flows",
     explanation: "Positioning tracks where investors are actually putting their money. Extreme positioning (80%+) can signal overcrowding and vulnerability to sharp reversals. Current flows show strong institutional and retail commitment, but this concentration increases systemic risk if sentiment shifts.",
-    userWeight: 100,
+    marketWeight: 18,
+    userWeight: 18,
     indexes: [
       {
         id: "fund-flows",
@@ -154,7 +158,8 @@ export const CATEGORIES: Category[] = [
     name: "Macro & Liquidity",
     description: "Economic environment and capital availability",
     explanation: "Macro conditions determine how much money is available to chase assets. Low rates and high liquidity (below 60% on fear indicators) fuel speculation. Current conditions show moderate support with some caution, but any liquidity tightening could trigger rapid derating.",
-    userWeight: 100,
+    marketWeight: 22,
+    userWeight: 22,
     indexes: [
       {
         id: "interest-rates",
@@ -195,7 +200,8 @@ export const CATEGORIES: Category[] = [
     name: "AI Infra Cycles & Profitability",
     description: "Business fundamentals and infrastructure",
     explanation: "Fundamentals show whether AI businesses can justify their valuations through real profits and growth. Strong fundamentals (70%+) can support high valuations, but if revenue growth slows or margins compress, the market could reprice aggressively. Current metrics show strong growth but mixed profitability.",
-    userWeight: 100,
+    marketWeight: 15,
+    userWeight: 15,
     indexes: [
       {
         id: "revenue-growth",

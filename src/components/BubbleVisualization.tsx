@@ -59,9 +59,9 @@ export const BubbleVisualization = ({
   };
 
   const risk = getBurstRisk(score);
-  // Scale bubble size based on actual score (no capping)
-  // Min size: 100px at score 0, Max size: 380px at score 100
-  const bubbleSize = Math.max(100, Math.min(380, 100 + (score * 2.8)));
+  // Dramatic bubble size scaling for clear visual feedback
+  // Min size: 80px at score 0, Max size: 500px at score 100
+  const bubbleSize = 80 + (score * 4.2);
 
   return (
     <div className="relative flex flex-col items-center justify-between h-full p-8">

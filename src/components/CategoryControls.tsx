@@ -62,17 +62,23 @@ export const CategoryControls = ({
 
   const getCategoryScore = (category: Category) => {
     return category.indexes.reduce((sum, index) => {
-      return sum + (index.value * index.marketWeight / 100);
-    }, 0);
+      return sum + index.value;
+    }, 0) / category.indexes.length;
   };
 
   const getContribution = (category: Category) => {
-    const baseScore = getCategoryScore(category);
-    return (baseScore * category.userWeight) / 100;
+    const categoryScore = getCategoryScore(category);
+    return (categoryScore * category.userWeight) / 100;
   };
 
   const getTotalScore = () => {
-    return categories.reduce((total, cat) => total + getContribution(cat), 0);
+    let totalScore = 0;
+    let totalWeight = 0;
+    categories.forEach(cat => {
+      totalScore += getCategoryScore(cat) * cat.userWeight;
+      totalWeight += cat.userWeight;
+    });
+    return totalWeight > 0 ? totalScore / totalWeight : 0;
   };
 
   return (
@@ -154,7 +160,7 @@ export const CategoryControls = ({
                       {category.userWeight.toFixed(0)}%
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      Market: {100}%
+                      Market: {category.marketWeight}%
                     </div>
                   </div>
                   {showAdvanced && (
@@ -198,7 +204,7 @@ export const CategoryControls = ({
                     <div>
                       <div className="flex justify-between items-center mb-2">
                         <span className="text-sm text-muted-foreground">
-                          Weight: {category.userWeight}
+                          Weight: {category.userWeight}%
                         </span>
                         <TooltipProvider>
                           <Tooltip>
@@ -206,7 +212,7 @@ export const CategoryControls = ({
                               <Info className="w-3 h-3 text-muted-foreground" />
                             </TooltipTrigger>
                             <TooltipContent>
-                              <p>Adjust category importance (0 = Ignore, 100 = Market, 200 = Critical)</p>
+                              <p>Adjust category importance (0% = Ignore, 100% = Maximum)</p>
                             </TooltipContent>
                           </Tooltip>
                         </TooltipProvider>
@@ -218,14 +224,13 @@ export const CategoryControls = ({
                             onCategoryWeightChange(category.id, value)
                           }
                           min={0}
-                          max={200}
+                          max={100}
                           step={1}
                           className="mb-2"
                         />
                         <div className="flex justify-between text-xs text-muted-foreground">
                           <span>0</span>
-                          <span className="text-primary">100</span>
-                          <span>200</span>
+                          <span>100</span>
                         </div>
                       </div>
                     </div>

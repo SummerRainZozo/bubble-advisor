@@ -13,23 +13,24 @@ const Index = () => {
   const { isListening, isProcessing, startRecording, stopRecording } = useVoiceAgent();
 
   const calculateScore = (cats: Category[], useUserWeights: boolean = false) => {
-    // Calculate total market weight across all categories
-    const totalMarketWeight = cats.reduce((sum, cat) => 
-      sum + cat.indexes.reduce((catSum, idx) => catSum + idx.marketWeight, 0), 0
-    );
+    let totalScore = 0;
+    let totalWeight = 0;
     
-    return cats.reduce((total, category) => {
+    cats.forEach(category => {
+      // Calculate category score as average of its indexes (0-100)
       const categoryScore = category.indexes.reduce((sum, index) => {
-        // Use userValue if available (advanced mode), otherwise use default value
         const indexValue = useUserWeights && index.userValue !== undefined ? index.userValue : index.value;
-        // Calculate weighted contribution on 0-100 scale
-        return sum + (indexValue * index.marketWeight / totalMarketWeight * 100);
-      }, 0);
+        return sum + indexValue;
+      }, 0) / category.indexes.length;
       
-      // For user weights, apply category weight scaling (0-200% range, centered at 100%)
-      const weight = useUserWeights ? category.userWeight / 100 : 1;
-      return total + (categoryScore * weight);
-    }, 0) / (useUserWeights ? cats.length : 1);
+      // Apply category weight (0-100 means 0-100% influence)
+      const weight = useUserWeights ? category.userWeight : category.marketWeight;
+      totalScore += categoryScore * weight;
+      totalWeight += weight;
+    });
+    
+    // Normalize to 0-100 scale
+    return totalWeight > 0 ? Math.min(100, totalScore / totalWeight) : 0;
   };
 
   useEffect(() => {
@@ -41,17 +42,9 @@ const Index = () => {
     setCategories((prev) =>
       prev.map((cat) => {
         if (cat.id === categoryId) {
-          // In normal mode, update category weight and proportionally scale all indexes
-          const scaleFactor = weight / cat.userWeight;
           return {
             ...cat,
             userWeight: weight,
-            indexes: cat.indexes.map(idx => ({
-              ...idx,
-              userValue: idx.userValue !== undefined 
-                ? idx.userValue * scaleFactor 
-                : idx.value * scaleFactor
-            }))
           };
         }
         return cat;
@@ -63,28 +56,11 @@ const Index = () => {
     setCategories((prev) =>
       prev.map((cat) => {
         if (cat.id === categoryId) {
-          // Update the specific index value
-          const updatedIndexes = cat.indexes.map(idx =>
-            idx.id === indexId ? { ...idx, userValue: value } : idx
-          );
-          
-          // Recalculate category weight based on new index values
-          const marketCategoryScore = cat.indexes.reduce((sum, idx) => 
-            sum + (idx.value * idx.marketWeight / 100), 0
-          );
-          const userCategoryScore = updatedIndexes.reduce((sum, idx) => 
-            sum + ((idx.userValue ?? idx.value) * idx.marketWeight / 100), 0
-          );
-          
-          // Calculate new category weight as percentage of market score
-          const newWeight = marketCategoryScore > 0 
-            ? (userCategoryScore / marketCategoryScore) * 100 
-            : 100;
-          
           return {
             ...cat,
-            indexes: updatedIndexes,
-            userWeight: Math.max(0, Math.min(200, newWeight))
+            indexes: cat.indexes.map(idx =>
+              idx.id === indexId ? { ...idx, userValue: value } : idx
+            ),
           };
         }
         return cat;
@@ -96,7 +72,7 @@ const Index = () => {
     setCategories(
       CATEGORIES.map((cat) => ({
         ...cat,
-        userWeight: 100,
+        userWeight: cat.marketWeight,
         indexes: cat.indexes.map(idx => ({ ...idx, userValue: undefined }))
       }))
     );
