@@ -202,16 +202,17 @@ const Index = () => {
 
           {/* User Analysis Bubble */}
           <Card
-            className="p-8 bg-card border-border cursor-pointer hover:border-primary/50 transition-colors"
-            onClick={() => navigate("/user-analysis")}
+            className="p-8 bg-card border-border hover:border-primary/50 transition-colors overflow-hidden"
           >
-            <BubbleVisualization
-              score={userScore}
-              title="Your Analysis"
-              subtitle="Assign your own weights in factors in estimating AI bubble"
-            />
-            <div className="mt-4 pt-4 border-t border-border">
-              <p className="text-sm text-muted-foreground leading-relaxed">
+            <div onClick={() => navigate("/user-analysis")} className="cursor-pointer">
+              <BubbleVisualization
+                score={userScore}
+                title="Your Analysis"
+                subtitle="Assign your own weights in factors in estimating AI bubble"
+              />
+            </div>
+            <div className="mt-6 pt-6 border-t border-border/50">
+              <p className="text-sm text-muted-foreground/90 leading-relaxed">
                 {generateInsight()}
               </p>
             </div>
