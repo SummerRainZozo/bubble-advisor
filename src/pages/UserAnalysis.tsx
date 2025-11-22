@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { BubbleVisualization } from "@/components/BubbleVisualization";
-import { BubbleTrendChart } from "@/components/BubbleTrendChart";
 import { CategoryControls } from "@/components/CategoryControls";
 import { CATEGORIES, Category } from "@/types/bubble";
 import { Card } from "@/components/ui/card";
@@ -150,11 +149,6 @@ const UserAnalysis = () => {
               isListening={isListening}
             />
           </Card>
-        </div>
-
-        {/* Trend Chart */}
-        <div className="mb-12">
-          <BubbleTrendChart currentScore={userScore} />
         </div>
 
         {/* User Controls - Fully Editable */}
