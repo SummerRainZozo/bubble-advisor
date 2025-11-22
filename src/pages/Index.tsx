@@ -12,6 +12,7 @@ const Index = () => {
 
   const calculateScore = (cats: Category[], useUserWeights: boolean = false) => {
     let totalScore = 0;
+    let totalWeight = 0;
 
     cats.forEach((category) => {
       const categoryScore =
@@ -21,12 +22,11 @@ const Index = () => {
         }, 0) / category.indexes.length;
 
       const weight = useUserWeights ? category.userWeight : category.marketWeight;
-      // Weight contribution: category score multiplied by normalized weight
-      totalScore += categoryScore * (weight / 100);
+      totalScore += categoryScore * weight;
+      totalWeight += weight;
     });
 
-    // Average across all categories to get final score (0-100)
-    return Math.min(100, totalScore / cats.length);
+    return totalWeight > 0 ? Math.min(100, totalScore / totalWeight) : 0;
   };
 
   useEffect(() => {
