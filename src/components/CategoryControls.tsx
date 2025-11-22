@@ -18,6 +18,8 @@ interface CategoryControlsProps {
   onIndexValueChange?: (categoryId: string, indexId: string, value: number) => void;
   onReset: () => void;
   readOnly?: boolean;
+  isAdvancedMode?: boolean;
+  onModeChange?: (isAdvanced: boolean) => void;
 }
 
 export const CategoryControls = ({
@@ -26,11 +28,14 @@ export const CategoryControls = ({
   onIndexValueChange,
   onReset,
   readOnly = false,
+  isAdvancedMode = false,
+  onModeChange,
 }: CategoryControlsProps) => {
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
-  const [showAdvanced, setShowAdvanced] = useState(false);
   const [showExplanations, setShowExplanations] = useState<Set<string>>(new Set());
   const [showCategoryExplanations, setShowCategoryExplanations] = useState<Set<string>>(new Set());
+  
+  const showAdvanced = isAdvancedMode;
 
   const toggleCategory = (categoryId: string) => {
     const newExpanded = new Set(expandedCategories);
@@ -64,7 +69,8 @@ export const CategoryControls = ({
 
   const getCategoryScore = (category: Category, useUserValues: boolean = false) => {
     return category.indexes.reduce((sum, index) => {
-      const value = useUserValues && index.userValue !== undefined ? index.userValue : index.value;
+      // In advanced mode use userValue if set, in normal mode always use market value
+      const value = useUserValues && showAdvanced && index.userValue !== undefined ? index.userValue : index.value;
       return sum + value;
     }, 0) / category.indexes.length;
   };
@@ -125,14 +131,14 @@ export const CategoryControls = ({
         <div className="flex gap-2">
           <Button
             variant={!showAdvanced ? "default" : "outline"}
-            onClick={() => setShowAdvanced(false)}
+            onClick={() => onModeChange?.(false)}
             className="flex-1"
           >
             Normal Controls
           </Button>
           <Button
             variant={showAdvanced ? "default" : "outline"}
-            onClick={() => setShowAdvanced(true)}
+            onClick={() => onModeChange?.(true)}
             className="flex-1"
           >
             Advanced Controls
