@@ -89,6 +89,14 @@ export const CategoryControls = ({
     return Math.min(100, totalScore / categories.length);
   };
 
+  const getTotalContribution = () => {
+    let total = 0;
+    categories.forEach(cat => {
+      total += getContribution(cat);
+    });
+    return total;
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -136,8 +144,8 @@ export const CategoryControls = ({
           const showExplanation = showExplanations.has(category.id);
           const showCategoryExplanation = showCategoryExplanations.has(category.id);
           const contribution = getContribution(category);
-          const totalScore = getTotalScore();
-          const contributionPercentage = totalScore > 0 ? (contribution / totalScore) * 100 : 0;
+          const totalContribution = getTotalContribution();
+          const contributionPercentage = totalContribution > 0 ? (contribution / totalContribution) * 100 : 0;
 
           return (
             <Card

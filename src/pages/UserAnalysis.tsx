@@ -124,19 +124,19 @@ const UserAnalysis = () => {
             <div className="mb-4 text-center">
               <div className="text-sm text-muted-foreground">
                 Market Consensus: <span className="font-semibold text-primary">{(() => {
-                  // Calculate market consensus score using market weights and values
+                  // Calculate market consensus score using same formula as Index.tsx
                   let totalScore = 0;
-                  const marketCategories = CATEGORIES.map(cat => ({
-                    ...cat,
-                    indexes: cat.indexes.map(idx => ({ ...idx, userValue: undefined }))
-                  }));
-                  
-                  marketCategories.forEach(category => {
-                    const categoryScore = category.indexes.reduce((sum, index) => sum + index.value, 0) / category.indexes.length;
-                    totalScore += categoryScore * (category.marketWeight / 100);
+                  let totalWeight = 0;
+
+                  CATEGORIES.forEach((category) => {
+                    const categoryScore =
+                      category.indexes.reduce((sum, index) => sum + index.value, 0) / category.indexes.length;
+
+                    totalScore += categoryScore * category.marketWeight;
+                    totalWeight += category.marketWeight;
                   });
-                  
-                  return Math.min(100, totalScore / marketCategories.length).toFixed(1);
+
+                  return totalWeight > 0 ? Math.min(100, totalScore / totalWeight).toFixed(1) : '0.0';
                 })()}</span>
               </div>
             </div>
