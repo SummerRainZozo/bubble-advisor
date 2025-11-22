@@ -182,7 +182,7 @@ export const BubbleTrendChart = ({ currentScore }: BubbleTrendChartProps) => {
                 data={data.slice(0, currentIndex + 1)}
               />
               
-              {/* Projected line (dashed) - starts from current point */}
+              {/* Projected line (dashed) - starts after historical data ends */}
               <Line 
                 type="monotone" 
                 dataKey="score" 
@@ -191,7 +191,7 @@ export const BubbleTrendChart = ({ currentScore }: BubbleTrendChartProps) => {
                 strokeDasharray="8 4"
                 dot={false}
                 opacity={0.6}
-                data={[data[currentIndex], ...data.slice(currentIndex + 1)]}
+                data={data.slice(currentIndex)}
               />
               
               {/* Current position dot */}
