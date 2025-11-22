@@ -199,7 +199,7 @@ const Index = () => {
                 subtitle="Algorithm reflecting real-time market factors"
               />
             </div>
-            <div className="mt-6 pt-6 border-t border-border/50 flex-shrink-0">
+            <div className="mt-6 pt-6 border-t border-border/50 flex-shrink-0 min-h-[120px]">
               <p className="text-sm text-muted-foreground/90 leading-relaxed">
                 Market consensus reflects elevated valuations and strong sentiment across AI stocks. High scores in Sentiment & Hype (85%+) and Market Valuation (78%+) indicate significant bubble risk.
               </p>
@@ -217,7 +217,7 @@ const Index = () => {
                 subtitle="Assign your own weights in factors in estimating AI bubble"
               />
             </div>
-            <div className="mt-6 pt-6 border-t border-border/50 flex-shrink-0">
+            <div className="mt-6 pt-6 border-t border-border/50 flex-shrink-0 min-h-[120px]">
               <p className="text-sm text-muted-foreground/90 leading-relaxed">
                 {generateInsight()}
               </p>
