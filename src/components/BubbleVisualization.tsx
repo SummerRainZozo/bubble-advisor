@@ -61,7 +61,7 @@ export const BubbleVisualization = ({
   const risk = getBurstRisk(score);
   // Dramatic bubble size scaling for clear visual feedback
   // Min size: 80px at score 0, Max size: 500px at score 100
-  const bubbleSize = 80 + (score * 4.2);
+  const bubbleSize = 180 + score * 4.2;
 
   return (
     <div className="relative flex flex-col items-center justify-between h-full p-8">
@@ -85,11 +85,7 @@ export const BubbleVisualization = ({
               size="icon"
               className={`rounded-full ${isListening ? "animate-pulse" : ""}`}
             >
-              {isListening ? (
-                <MicOff className="w-5 h-5" />
-              ) : (
-                <Mic className="w-5 h-5" />
-              )}
+              {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
             </Button>
           </motion.div>
         )}
@@ -99,8 +95,8 @@ export const BubbleVisualization = ({
             key={score}
             className="relative cursor-pointer"
             initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ 
-              scale: 1, 
+            animate={{
+              scale: 1,
               opacity: 1,
               ...(animation === "pulse" && {
                 scale: [1, 1.02, 1],
@@ -112,10 +108,10 @@ export const BubbleVisualization = ({
                 scale: [1, 0.9, 1],
               }),
             }}
-            transition={{ 
+            transition={{
               duration: animation === "pulse" ? 2 : 0.6,
               repeat: animation === "pulse" ? Infinity : 0,
-              ease: "easeInOut"
+              ease: "easeInOut",
             }}
             style={{
               width: bubbleSize,
@@ -124,7 +120,7 @@ export const BubbleVisualization = ({
             onClick={isUserBubble && !isListening ? onVoiceStart : undefined}
           >
             {/* Outer glow effect */}
-            <motion.div 
+            <motion.div
               className="absolute inset-0 rounded-full bubble-glow-strong"
               animate={{
                 scale: [1, 1.08, 1],
@@ -136,9 +132,9 @@ export const BubbleVisualization = ({
                 ease: "easeInOut",
               }}
             />
-            
+
             {/* Main bubble with gradient */}
-            <div 
+            <div
               className="absolute inset-0 rounded-full border-2 border-primary/20 backdrop-blur-md overflow-hidden"
               style={{
                 background: `radial-gradient(circle at 30% 30%, 
@@ -149,7 +145,7 @@ export const BubbleVisualization = ({
               }}
             >
               {/* Primary highlight */}
-              <motion.div 
+              <motion.div
                 className="absolute top-6 left-6 w-20 h-20 rounded-full"
                 style={{
                   background: `radial-gradient(circle, 
@@ -169,7 +165,7 @@ export const BubbleVisualization = ({
               />
 
               {/* Secondary highlight */}
-              <motion.div 
+              <motion.div
                 className="absolute bottom-12 right-12 w-12 h-12 rounded-full"
                 style={{
                   background: `radial-gradient(circle, 
@@ -187,7 +183,7 @@ export const BubbleVisualization = ({
                   delay: 0.5,
                 }}
               />
-              
+
               {/* Floating particles */}
               {[...Array(5)].map((_, i) => (
                 <motion.div
@@ -218,14 +214,14 @@ export const BubbleVisualization = ({
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <motion.div
                   className="text-6xl font-bold bg-gradient-to-br from-primary to-bubble-secondary bg-clip-text text-transparent"
-                  animate={{ 
+                  animate={{
                     scale: [1, 1.03, 1],
                   }}
                   transition={{ duration: 2, repeat: Infinity }}
                 >
                   {Math.round(score)}
                 </motion.div>
-                <motion.div 
+                <motion.div
                   className="text-xs text-foreground/60 uppercase tracking-wider mt-2 font-medium"
                   animate={{ opacity: [0.6, 1, 0.6] }}
                   transition={{ duration: 2, repeat: Infinity }}
