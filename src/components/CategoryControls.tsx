@@ -285,7 +285,11 @@ export const CategoryControls = ({
                     <div>
                       <div className="flex justify-between items-center mb-2">
                         <span className="text-sm text-muted-foreground">
-                          Weight: {category.userWeight}%
+                          Weight: {(() => {
+                            const totalWeight = categories.reduce((sum, cat) => sum + cat.userWeight, 0);
+                            const normalizedWeight = totalWeight > 0 ? (category.userWeight / totalWeight * 100) : 0;
+                            return normalizedWeight.toFixed(1);
+                          })()}%
                         </span>
                         <TooltipProvider>
                           <Tooltip>
@@ -293,7 +297,7 @@ export const CategoryControls = ({
                               <Info className="w-3 h-3 text-muted-foreground" />
                             </TooltipTrigger>
                             <TooltipContent>
-                              <p>Category importance (0% = Ignore, 100% = Maximum Impact)</p>
+                              <p>Category importance - all weights sum to 100%</p>
                             </TooltipContent>
                           </Tooltip>
                         </TooltipProvider>
