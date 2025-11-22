@@ -121,18 +121,11 @@ export const CategoryControls = ({
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div className="flex-1">
+        <div>
           <h2 className="text-2xl font-bold text-primary">Market Factors</h2>
           <p className="text-sm text-muted-foreground mt-1">
             Adjust weights and values to customize your analysis
           </p>
-          <div className="mt-3 p-3 bg-primary/5 rounded-lg border border-primary/20">
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              <strong>Normal Controls:</strong> Set each category's score (your view on risk level) and weight (importance). 
-              All weights must sum to 100%. <strong>Advanced Controls:</strong> Adjust individual factor indexes within each category. 
-              The category score is calculated from these factors, then combined with weights to determine the overall bubble index.
-            </p>
-          </div>
         </div>
         {!readOnly && (
           <Button
@@ -316,25 +309,14 @@ export const CategoryControls = ({
                             onCategoryWeightChange(category.id, value)
                           }
                           min={0}
-                          max={(() => {
-                            // Calculate max as 100 minus sum of all other categories
-                            const otherWeightsSum = categories
-                              .filter(cat => cat.id !== category.id)
-                              .reduce((sum, cat) => sum + cat.userWeight, 0);
-                            return 100 - otherWeightsSum;
-                          })()}
+                          max={100}
                           step={1}
                           className="mb-2"
                           disabled={readOnly}
                         />
                         <div className="flex justify-between text-xs text-muted-foreground">
                           <span>0</span>
-                          <span>{(() => {
-                            const otherWeightsSum = categories
-                              .filter(cat => cat.id !== category.id)
-                              .reduce((sum, cat) => sum + cat.userWeight, 0);
-                            return 100 - otherWeightsSum;
-                          })()}</span>
+                          <span>100</span>
                         </div>
                       </div>
                     </div>
