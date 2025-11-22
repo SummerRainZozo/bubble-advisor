@@ -62,25 +62,31 @@ export const CategoryControls = ({
     setShowCategoryExplanations(newExplanations);
   };
 
-  const getCategoryScore = (category: Category) => {
+  const getCategoryScore = (category: Category, useUserValues: boolean = false) => {
+    return category.indexes.reduce((sum, index) => {
+      const value = useUserValues && index.userValue !== undefined ? index.userValue : index.value;
+      return sum + value;
+    }, 0) / category.indexes.length;
+  };
+
+  const getMarketCategoryScore = (category: Category) => {
     return category.indexes.reduce((sum, index) => {
       return sum + index.value;
     }, 0) / category.indexes.length;
   };
 
   const getContribution = (category: Category) => {
-    const categoryScore = getCategoryScore(category);
+    const categoryScore = getCategoryScore(category, true);
     return (categoryScore * category.userWeight) / 100;
   };
 
   const getTotalScore = () => {
     let totalScore = 0;
-    let totalWeight = 0;
     categories.forEach(cat => {
-      totalScore += getCategoryScore(cat) * cat.userWeight;
-      totalWeight += cat.userWeight;
+      const categoryScore = getCategoryScore(cat, true);
+      totalScore += categoryScore * (cat.userWeight / 100);
     });
-    return totalWeight > 0 ? totalScore / totalWeight : 0;
+    return Math.min(100, totalScore / categories.length);
   };
 
   return (
@@ -166,7 +172,7 @@ export const CategoryControls = ({
                       {category.userWeight.toFixed(0)}%
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      Market: {category.marketWeight.toFixed(0)}%
+                      Market: {getMarketCategoryScore(category).toFixed(0)}
                     </div>
                   </div>
                   {showAdvanced && (
@@ -295,18 +301,9 @@ export const CategoryControls = ({
                             <div className="p-3 mt-2 bg-secondary/30 rounded-lg border border-border/50">
                               <p className="text-xs text-muted-foreground leading-relaxed">
                                 This category contributes <strong>{contributionPercentage.toFixed(1)}%</strong> to the overall bubble score. 
-                                The contribution is calculated by multiplying the category's base score ({getCategoryScore(category).toFixed(1)}) 
+                                The contribution is calculated by multiplying the category's score ({getCategoryScore(category, true).toFixed(1)}) 
                                 by your custom weight ({category.userWeight}%) and normalizing against the total score.
-                                {category.userWeight > 100 && (
-                                  <span className="block mt-1 text-yellow-500">
-                                    You've weighted this category above market consensus ({category.userWeight}% vs 100%).
-                                  </span>
-                                )}
-                                {category.userWeight < 100 && (
-                                  <span className="block mt-1 text-blue-400">
-                                    You've weighted this category below market consensus ({category.userWeight}% vs 100%).
-                                  </span>
-                                )}
+                                Market score for this category is {getMarketCategoryScore(category).toFixed(1)}.
                               </p>
                             </div>
                           </motion.div>
