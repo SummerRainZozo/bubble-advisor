@@ -3,11 +3,13 @@ import { BubbleVisualization } from "@/components/BubbleVisualization";
 import { CategoryControls } from "@/components/CategoryControls";
 import { CATEGORIES, Category } from "@/types/bubble";
 import { Card } from "@/components/ui/card";
+import { useVoiceAgent } from "@/hooks/useVoiceAgent";
 
 const Index = () => {
   const [categories, setCategories] = useState<Category[]>(CATEGORIES);
   const [marketScore, setMarketScore] = useState(0);
   const [userScore, setUserScore] = useState(0);
+  const { isListening, isProcessing, startRecording, stopRecording } = useVoiceAgent();
 
   const calculateScore = (cats: Category[], useUserWeights: boolean = false) => {
     return cats.reduce((total, category) => {
@@ -129,6 +131,9 @@ const Index = () => {
               title="Your Analysis"
               subtitle="Custom factor weights"
               isUserBubble
+              onVoiceStart={startRecording}
+              onVoiceStop={stopRecording}
+              isListening={isListening}
             />
           </Card>
         </div>
