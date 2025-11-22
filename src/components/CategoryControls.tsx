@@ -17,6 +17,7 @@ interface CategoryControlsProps {
   onCategoryWeightChange: (categoryId: string, weight: number) => void;
   onIndexValueChange?: (categoryId: string, indexId: string, value: number) => void;
   onReset: () => void;
+  readOnly?: boolean;
 }
 
 export const CategoryControls = ({
@@ -24,6 +25,7 @@ export const CategoryControls = ({
   onCategoryWeightChange,
   onIndexValueChange,
   onReset,
+  readOnly = false,
 }: CategoryControlsProps) => {
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -90,33 +92,37 @@ export const CategoryControls = ({
             Adjust weights and values to customize your analysis
           </p>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onReset}
-          className="gap-2"
-        >
-          <RotateCcw className="w-4 h-4" />
-          Reset
-        </Button>
+        {!readOnly && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onReset}
+            className="gap-2"
+          >
+            <RotateCcw className="w-4 h-4" />
+            Reset
+          </Button>
+        )}
       </div>
 
-      <div className="flex gap-2">
-        <Button
-          variant={!showAdvanced ? "default" : "outline"}
-          onClick={() => setShowAdvanced(false)}
-          className="flex-1"
-        >
-          Normal Controls
-        </Button>
-        <Button
-          variant={showAdvanced ? "default" : "outline"}
-          onClick={() => setShowAdvanced(true)}
-          className="flex-1"
-        >
-          Advanced Controls
-        </Button>
-      </div>
+      {!readOnly && (
+        <div className="flex gap-2">
+          <Button
+            variant={!showAdvanced ? "default" : "outline"}
+            onClick={() => setShowAdvanced(false)}
+            className="flex-1"
+          >
+            Normal Controls
+          </Button>
+          <Button
+            variant={showAdvanced ? "default" : "outline"}
+            onClick={() => setShowAdvanced(true)}
+            className="flex-1"
+          >
+            Advanced Controls
+          </Button>
+        </div>
+      )}
 
       <div className="space-y-4">
         {categories.map((category) => {
@@ -227,6 +233,7 @@ export const CategoryControls = ({
                           max={100}
                           step={1}
                           className="mb-2"
+                          disabled={readOnly}
                         />
                         <div className="flex justify-between text-xs text-muted-foreground">
                           <span>0</span>
@@ -390,6 +397,7 @@ export const CategoryControls = ({
                               max={100}
                               step={1}
                               className="mb-1"
+                              disabled={readOnly}
                             />
                             <div className="flex justify-between text-xs text-muted-foreground">
                               <span>0%</span>
