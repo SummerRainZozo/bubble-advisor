@@ -17,7 +17,6 @@ const UserAnalysis = () => {
 
   const calculateScore = (cats: Category[]) => {
     let totalScore = 0;
-    let totalWeight = 0;
     
     cats.forEach(category => {
       const categoryScore = category.indexes.reduce((sum, index) => {
@@ -25,11 +24,12 @@ const UserAnalysis = () => {
         return sum + indexValue;
       }, 0) / category.indexes.length;
       
-      totalScore += categoryScore * category.userWeight;
-      totalWeight += category.userWeight;
+      // Weight contribution: category score multiplied by normalized weight
+      totalScore += categoryScore * (category.userWeight / 100);
     });
     
-    return totalWeight > 0 ? Math.min(100, totalScore / totalWeight) : 0;
+    // Average across all categories to get final score (0-100)
+    return Math.min(100, totalScore / cats.length);
   };
 
   useEffect(() => {
@@ -106,6 +106,11 @@ const UserAnalysis = () => {
         {/* Bubble Visualization */}
         <div className="mb-12">
           <Card className="p-8 bg-card border-border">
+            <div className="mb-4 text-center">
+              <div className="text-sm text-muted-foreground">
+                Market Consensus: <span className="font-semibold text-primary">{calculateScore(categories.map(cat => ({ ...cat, userWeight: cat.marketWeight, indexes: cat.indexes.map(idx => ({ ...idx, userValue: undefined })) })))?.toFixed(1)}</span>
+              </div>
+            </div>
             <BubbleVisualization
               score={userScore}
               title="Your Analysis"
