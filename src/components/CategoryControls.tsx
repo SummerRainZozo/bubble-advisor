@@ -82,11 +82,13 @@ export const CategoryControls = ({
 
   const getTotalScore = () => {
     let totalScore = 0;
+    let totalWeight = 0;
     categories.forEach(cat => {
       const categoryScore = getCategoryScore(cat, true);
-      totalScore += categoryScore * (cat.userWeight / 100);
+      totalScore += categoryScore * cat.userWeight;
+      totalWeight += cat.userWeight;
     });
-    return Math.min(100, totalScore / categories.length);
+    return totalWeight > 0 ? Math.min(100, totalScore / totalWeight) : 0;
   };
 
   const getTotalContribution = () => {

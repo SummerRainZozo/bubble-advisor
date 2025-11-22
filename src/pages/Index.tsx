@@ -14,6 +14,7 @@ const Index = () => {
     if (useUserWeights) {
       // User score calculation - matches UserAnalysis.tsx
       let totalScore = 0;
+      let totalWeight = 0;
       
       cats.forEach(category => {
         const categoryScore = category.indexes.reduce((sum, index) => {
@@ -21,10 +22,11 @@ const Index = () => {
           return sum + indexValue;
         }, 0) / category.indexes.length;
         
-        totalScore += categoryScore * (category.userWeight / 100);
+        totalScore += categoryScore * category.userWeight;
+        totalWeight += category.userWeight;
       });
       
-      return Math.min(100, totalScore / cats.length);
+      return totalWeight > 0 ? Math.min(100, totalScore / totalWeight) : 0;
     } else {
       // Market score calculation
       let totalScore = 0;
