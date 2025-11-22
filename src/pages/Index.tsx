@@ -11,22 +11,35 @@ const Index = () => {
   const [userScore, setUserScore] = useState(0);
 
   const calculateScore = (cats: Category[], useUserWeights: boolean = false) => {
-    let totalScore = 0;
-    let totalWeight = 0;
-
-    cats.forEach((category) => {
-      const categoryScore =
-        category.indexes.reduce((sum, index) => {
-          const indexValue = useUserWeights && index.userValue !== undefined ? index.userValue : index.value;
+    if (useUserWeights) {
+      // User score calculation - matches UserAnalysis.tsx
+      let totalScore = 0;
+      
+      cats.forEach(category => {
+        const categoryScore = category.indexes.reduce((sum, index) => {
+          const indexValue = index.userValue !== undefined ? index.userValue : index.value;
           return sum + indexValue;
         }, 0) / category.indexes.length;
+        
+        totalScore += categoryScore * (category.userWeight / 100);
+      });
+      
+      return Math.min(100, totalScore / cats.length);
+    } else {
+      // Market score calculation
+      let totalScore = 0;
+      let totalWeight = 0;
 
-      const weight = useUserWeights ? category.userWeight : category.marketWeight;
-      totalScore += categoryScore * weight;
-      totalWeight += weight;
-    });
+      cats.forEach((category) => {
+        const categoryScore =
+          category.indexes.reduce((sum, index) => sum + index.value, 0) / category.indexes.length;
 
-    return totalWeight > 0 ? Math.min(100, totalScore / totalWeight) : 0;
+        totalScore += categoryScore * category.marketWeight;
+        totalWeight += category.marketWeight;
+      });
+
+      return totalWeight > 0 ? Math.min(100, totalScore / totalWeight) : 0;
+    }
   };
 
   useEffect(() => {
