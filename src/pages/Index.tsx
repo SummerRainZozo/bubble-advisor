@@ -12,7 +12,6 @@ const Index = () => {
 
   const calculateScore = (cats: Category[], useUserWeights: boolean = false) => {
     let totalScore = 0;
-    let totalWeight = 0;
     
     cats.forEach(category => {
       const categoryScore = category.indexes.reduce((sum, index) => {
@@ -21,16 +20,30 @@ const Index = () => {
       }, 0) / category.indexes.length;
       
       const weight = useUserWeights ? category.userWeight : category.marketWeight;
-      totalScore += categoryScore * weight;
-      totalWeight += weight;
+      // Weight contribution: category score multiplied by normalized weight
+      totalScore += categoryScore * (weight / 100);
     });
     
-    return totalWeight > 0 ? Math.min(100, totalScore / totalWeight) : 0;
+    // Average across all categories to get final score (0-100)
+    return Math.min(100, totalScore / cats.length);
   };
 
   useEffect(() => {
+    // Calculate market score
     setMarketScore(calculateScore(categories, false));
-    setUserScore(calculateScore(categories, true));
+    
+    // Load user categories from localStorage
+    const savedUserCategories = localStorage.getItem('userCategories');
+    if (savedUserCategories) {
+      try {
+        const parsed = JSON.parse(savedUserCategories);
+        setUserScore(calculateScore(parsed, true));
+      } catch (e) {
+        setUserScore(calculateScore(categories, true));
+      }
+    } else {
+      setUserScore(calculateScore(categories, true));
+    }
   }, [categories]);
 
   return (
