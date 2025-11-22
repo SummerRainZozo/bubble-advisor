@@ -49,10 +49,13 @@ export const BubbleVisualization = ({
   };
 
   const getTimeEstimate = (score: number) => {
-    if (score >= 85) return "< 30 days";
-    if (score >= 70) return "30-90 days";
-    if (score >= 50) return "90-180 days";
-    return "12+ months";
+    if (score >= 90) return "< 14 days";
+    if (score >= 85) return "1-2 months";
+    if (score >= 75) return "2-4 months";
+    if (score >= 65) return "4-8 months";
+    if (score >= 50) return "8-18 months";
+    if (score >= 35) return "18-36 months";
+    return "3+ years";
   };
 
   const risk = getBurstRisk(score);

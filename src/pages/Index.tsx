@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { BubbleVisualization } from "@/components/BubbleVisualization";
 import { CategoryControls } from "@/components/CategoryControls";
+import { BubbleTrendChart } from "@/components/BubbleTrendChart";
 import { CATEGORIES, Category } from "@/types/bubble";
 import { Card } from "@/components/ui/card";
 import { useVoiceAgent } from "@/hooks/useVoiceAgent";
@@ -12,16 +13,23 @@ const Index = () => {
   const { isListening, isProcessing, startRecording, stopRecording } = useVoiceAgent();
 
   const calculateScore = (cats: Category[], useUserWeights: boolean = false) => {
+    // Calculate total market weight across all categories
+    const totalMarketWeight = cats.reduce((sum, cat) => 
+      sum + cat.indexes.reduce((catSum, idx) => catSum + idx.marketWeight, 0), 0
+    );
+    
     return cats.reduce((total, category) => {
       const categoryScore = category.indexes.reduce((sum, index) => {
         // Use userValue if available (advanced mode), otherwise use default value
         const indexValue = useUserWeights && index.userValue !== undefined ? index.userValue : index.value;
-        return sum + (indexValue * index.marketWeight / 100);
+        // Calculate weighted contribution on 0-100 scale
+        return sum + (indexValue * index.marketWeight / totalMarketWeight * 100);
       }, 0);
       
+      // For user weights, apply category weight scaling (0-200% range, centered at 100%)
       const weight = useUserWeights ? category.userWeight / 100 : 1;
       return total + (categoryScore * weight);
-    }, 0);
+    }, 0) / (useUserWeights ? cats.length : 1);
   };
 
   useEffect(() => {
@@ -136,6 +144,11 @@ const Index = () => {
               isListening={isListening}
             />
           </Card>
+        </div>
+
+        {/* Trend Chart */}
+        <div className="mb-12">
+          <BubbleTrendChart currentScore={userScore} />
         </div>
 
         {/* Category Controls */}
