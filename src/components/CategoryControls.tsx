@@ -15,6 +15,7 @@ import {
 interface CategoryControlsProps {
   categories: Category[];
   onCategoryWeightChange: (categoryId: string, weight: number) => void;
+  onCategoryScoreChange?: (categoryId: string, score: number) => void;
   onIndexValueChange?: (categoryId: string, indexId: string, value: number) => void;
   onReset: () => void;
   readOnly?: boolean;
@@ -25,6 +26,7 @@ interface CategoryControlsProps {
 export const CategoryControls = ({
   categories,
   onCategoryWeightChange,
+  onCategoryScoreChange,
   onIndexValueChange,
   onReset,
   readOnly = false,
@@ -68,11 +70,22 @@ export const CategoryControls = ({
   };
 
   const getCategoryScore = (category: Category, useUserValues: boolean = false) => {
-    return category.indexes.reduce((sum, index) => {
-      // In advanced mode use userValue if set, in normal mode always use market value
-      const value = useUserValues && showAdvanced && index.userValue !== undefined ? index.userValue : index.value;
-      return sum + value;
-    }, 0) / category.indexes.length;
+    if (useUserValues) {
+      if (showAdvanced) {
+        // Advanced mode: calculate from individual factor values
+        return category.indexes.reduce((sum, index) => {
+          const value = index.userValue !== undefined ? index.userValue : index.value;
+          return sum + value;
+        }, 0) / category.indexes.length;
+      } else {
+        // Normal mode: use direct category score if set, otherwise use market values
+        if (category.userCategoryScore !== undefined) {
+          return category.userCategoryScore;
+        }
+      }
+    }
+    // Fallback to market values
+    return category.indexes.reduce((sum, index) => sum + index.value, 0) / category.indexes.length;
   };
 
   const getMarketCategoryScore = (category: Category) => {
@@ -226,9 +239,49 @@ export const CategoryControls = ({
                   )}
                 </AnimatePresence>
 
-                {/* Normal Mode: Category Slider */}
+                {/* Normal Mode: Category Sliders */}
                 {!showAdvanced && (
                   <div className="space-y-4">
+                    {/* Category Score Slider */}
+                    <div>
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-sm text-muted-foreground">
+                          Category Score: {(category.userCategoryScore ?? getMarketCategoryScore(category)).toFixed(0)}
+                        </span>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <Info className="w-3 h-3 text-muted-foreground" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Adjust your view on this category (0 = Very Low, 100 = Maximum Bubble)</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
+                      <div className="relative">
+                        <Slider
+                          value={[category.userCategoryScore ?? getMarketCategoryScore(category)]}
+                          onValueChange={([value]) => {
+                            if (onCategoryScoreChange) {
+                              onCategoryScoreChange(category.id, value);
+                            }
+                          }}
+                          min={0}
+                          max={100}
+                          step={1}
+                          className="mb-2"
+                          disabled={readOnly}
+                        />
+                        <div className="flex justify-between text-xs text-muted-foreground">
+                          <span>0</span>
+                          <span>Market: {getMarketCategoryScore(category).toFixed(0)}</span>
+                          <span>100</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Category Weight Slider */}
                     <div>
                       <div className="flex justify-between items-center mb-2">
                         <span className="text-sm text-muted-foreground">
