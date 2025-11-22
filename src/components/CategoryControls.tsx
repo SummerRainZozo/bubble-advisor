@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, ChevronUp, RotateCcw, Info } from "lucide-react";
+import { ChevronDown, ChevronUp, RotateCcw, Info, FileText } from "lucide-react";
 import { Category } from "@/types/bubble";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -25,6 +25,7 @@ export const CategoryControls = ({
 }: CategoryControlsProps) => {
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showExplanations, setShowExplanations] = useState<Set<string>>(new Set());
 
   const toggleCategory = (categoryId: string) => {
     const newExpanded = new Set(expandedCategories);
@@ -36,6 +37,16 @@ export const CategoryControls = ({
     setExpandedCategories(newExpanded);
   };
 
+  const toggleExplanation = (categoryId: string) => {
+    const newExplanations = new Set(showExplanations);
+    if (newExplanations.has(categoryId)) {
+      newExplanations.delete(categoryId);
+    } else {
+      newExplanations.add(categoryId);
+    }
+    setShowExplanations(newExplanations);
+  };
+
   const getCategoryScore = (category: Category) => {
     return category.indexes.reduce((sum, index) => {
       return sum + (index.value * index.marketWeight / 100);
@@ -45,6 +56,10 @@ export const CategoryControls = ({
   const getContribution = (category: Category) => {
     const baseScore = getCategoryScore(category);
     return (baseScore * category.userWeight) / 100;
+  };
+
+  const getTotalScore = () => {
+    return categories.reduce((total, cat) => total + getContribution(cat), 0);
   };
 
   return (
@@ -83,12 +98,15 @@ export const CategoryControls = ({
       <div className="space-y-4">
         {categories.map((category) => {
           const isExpanded = expandedCategories.has(category.id);
+          const showExplanation = showExplanations.has(category.id);
           const contribution = getContribution(category);
+          const totalScore = getTotalScore();
+          const contributionPercentage = totalScore > 0 ? (contribution / totalScore) * 100 : 0;
 
           return (
             <Card
               key={category.id}
-              className="p-6 bg-card border-border hover:border-primary/50 transition-colors"
+              className="p-6 bg-card border-border hover:border-primary/30 transition-all duration-200"
             >
               <div
                 className="cursor-pointer"
@@ -170,21 +188,76 @@ export const CategoryControls = ({
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-muted-foreground">Contribution to Bubble Score</span>
-                      <span className="text-lg font-bold text-primary">
-                        {contribution.toFixed(1)}
-                      </span>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground">Contribution to Total</span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 w-6 p-0"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleExplanation(category.id);
+                          }}
+                        >
+                          <FileText className="w-3 h-3" />
+                        </Button>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-xl font-bold text-primary">
+                          {contributionPercentage.toFixed(1)}%
+                        </span>
+                        <span className="text-xs text-muted-foreground ml-1">
+                          ({contribution.toFixed(1)} pts)
+                        </span>
+                      </div>
                     </div>
-                    <div className="h-2 bg-secondary rounded-full overflow-hidden">
-                      <motion.div
-                        className="h-full bg-primary"
-                        initial={{ width: 0 }}
-                        animate={{ width: `${Math.min(contribution * 5, 100)}%` }}
-                        transition={{ duration: 0.5 }}
-                      />
+                    
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-xs text-muted-foreground">
+                        <span>Relative Impact</span>
+                        <span>{contributionPercentage.toFixed(0)}% of total</span>
+                      </div>
+                      <div className="h-2 bg-secondary/50 rounded-full overflow-hidden">
+                        <motion.div
+                          className="h-full bg-gradient-to-r from-primary to-bubble-secondary"
+                          initial={{ width: 0 }}
+                          animate={{ width: `${Math.min(contributionPercentage, 100)}%` }}
+                          transition={{ duration: 0.5, ease: "easeOut" }}
+                        />
+                      </div>
                     </div>
+
+                    <AnimatePresence>
+                      {showExplanation && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="p-3 mt-2 bg-secondary/30 rounded-lg border border-border/50">
+                            <p className="text-xs text-muted-foreground leading-relaxed">
+                              This category contributes <strong>{contributionPercentage.toFixed(1)}%</strong> to the overall bubble score. 
+                              The contribution is calculated by multiplying the category's base score ({getCategoryScore(category).toFixed(1)}) 
+                              by your custom weight ({category.userWeight}%) and normalizing against the total score.
+                              {category.userWeight > 100 && (
+                                <span className="block mt-1 text-yellow-500">
+                                  You've weighted this category above market consensus ({category.userWeight}% vs 100%).
+                                </span>
+                              )}
+                              {category.userWeight < 100 && (
+                                <span className="block mt-1 text-blue-400">
+                                  You've weighted this category below market consensus ({category.userWeight}% vs 100%).
+                                </span>
+                              )}
+                            </p>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                 </div>
               </div>
