@@ -8,24 +8,24 @@ interface BubbleTrendChartProps {
 
 export const BubbleTrendChart = ({ currentScore }: BubbleTrendChartProps) => {
   // Generate historical and projected data
-  // Historical data shows growth trend
+  // Historical data is FIXED and doesn't change based on current score
   const generateTrendData = () => {
     const data = [];
     const startDate = new Date();
     startDate.setMonth(startDate.getMonth() - 12);
     
-    // Historical data (past 12 months) - showing growth
+    // FIXED historical data (past 12 months) - realistic AI bubble growth
+    // This represents the actual historical trend regardless of user input
+    const historicalScores = [35, 38, 42, 45, 50, 54, 58, 63, 67, 70, 73, 75, 75];
+    
     for (let i = 0; i <= 12; i++) {
       const date = new Date(startDate);
       date.setMonth(date.getMonth() + i);
       const monthLabel = date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
       
-      // Create realistic growth curve leading to current score
-      const historicalScore = 35 + (currentScore - 35) * Math.pow(i / 12, 1.3);
-      
       data.push({
         month: monthLabel,
-        score: Math.round(historicalScore * 10) / 10,
+        score: historicalScores[i],
         monthIndex: i - 12,
         type: 'historical'
       });

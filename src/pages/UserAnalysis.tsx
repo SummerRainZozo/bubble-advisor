@@ -34,7 +34,22 @@ const UserAnalysis = () => {
 
   useEffect(() => {
     setUserScore(calculateScore(categories));
+    // Autosave to localStorage
+    localStorage.setItem('userCategories', JSON.stringify(categories));
   }, [categories]);
+
+  // Load from localStorage on mount
+  useEffect(() => {
+    const savedCategories = localStorage.getItem('userCategories');
+    if (savedCategories) {
+      try {
+        const parsed = JSON.parse(savedCategories);
+        setCategories(parsed);
+      } catch (e) {
+        console.error('Failed to load saved categories');
+      }
+    }
+  }, []);
 
   const handleCategoryWeightChange = (categoryId: string, weight: number) => {
     setCategories((prev) =>
@@ -85,7 +100,7 @@ const UserAnalysis = () => {
           <Button
             variant="ghost"
             onClick={() => navigate('/')}
-            className="mb-4"
+            className="mb-4 text-white hover:text-white/80"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Overview
@@ -108,7 +123,21 @@ const UserAnalysis = () => {
           <Card className="p-8 bg-card border-border">
             <div className="mb-4 text-center">
               <div className="text-sm text-muted-foreground">
-                Market Consensus: <span className="font-semibold text-primary">{calculateScore(categories.map(cat => ({ ...cat, userWeight: cat.marketWeight, indexes: cat.indexes.map(idx => ({ ...idx, userValue: undefined })) })))?.toFixed(1)}</span>
+                Market Consensus: <span className="font-semibold text-primary">{(() => {
+                  // Calculate market consensus score using market weights and values
+                  let totalScore = 0;
+                  const marketCategories = CATEGORIES.map(cat => ({
+                    ...cat,
+                    indexes: cat.indexes.map(idx => ({ ...idx, userValue: undefined }))
+                  }));
+                  
+                  marketCategories.forEach(category => {
+                    const categoryScore = category.indexes.reduce((sum, index) => sum + index.value, 0) / category.indexes.length;
+                    totalScore += categoryScore * (category.marketWeight / 100);
+                  });
+                  
+                  return Math.min(100, totalScore / marketCategories.length).toFixed(1);
+                })()}</span>
               </div>
             </div>
             <BubbleVisualization

@@ -166,7 +166,7 @@ export const CategoryControls = ({
                       {category.userWeight.toFixed(0)}%
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      Market: {category.marketWeight}%
+                      Market: {category.marketWeight.toFixed(0)}%
                     </div>
                   </div>
                   {showAdvanced && (
@@ -360,7 +360,7 @@ export const CategoryControls = ({
                                 {currentValue.toFixed(0)}%
                               </div>
                               <div className="text-xs text-muted-foreground">
-                                weight: {index.marketWeight}%
+                                Market: {index.value.toFixed(0)}%
                               </div>
                             </div>
                           </div>
