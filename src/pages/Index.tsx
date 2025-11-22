@@ -12,18 +12,19 @@ const Index = () => {
 
   const calculateScore = (cats: Category[], useUserWeights: boolean = false) => {
     let totalScore = 0;
-    
-    cats.forEach(category => {
-      const categoryScore = category.indexes.reduce((sum, index) => {
-        const indexValue = useUserWeights && index.userValue !== undefined ? index.userValue : index.value;
-        return sum + indexValue;
-      }, 0) / category.indexes.length;
-      
+
+    cats.forEach((category) => {
+      const categoryScore =
+        category.indexes.reduce((sum, index) => {
+          const indexValue = useUserWeights && index.userValue !== undefined ? index.userValue : index.value;
+          return sum + indexValue;
+        }, 0) / category.indexes.length;
+
       const weight = useUserWeights ? category.userWeight : category.marketWeight;
       // Weight contribution: category score multiplied by normalized weight
       totalScore += categoryScore * (weight / 100);
     });
-    
+
     // Average across all categories to get final score (0-100)
     return Math.min(100, totalScore / cats.length);
   };
@@ -31,9 +32,9 @@ const Index = () => {
   useEffect(() => {
     // Calculate market score
     setMarketScore(calculateScore(categories, false));
-    
+
     // Load user categories from localStorage
-    const savedUserCategories = localStorage.getItem('userCategories');
+    const savedUserCategories = localStorage.getItem("userCategories");
     if (savedUserCategories) {
       try {
         const parsed = JSON.parse(savedUserCategories);
@@ -53,11 +54,10 @@ const Index = () => {
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5" />
         <div className="relative container mx-auto px-4 py-16">
           <div className="text-center space-y-4">
-            <h1 className="text-5xl font-bold text-primary">
-              AI Bubble Visualizer
-            </h1>
+            <h1 className="text-5xl font-bold text-primary">AI Bubble Visualizer</h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Analyze the AI market bubble using key economic indicators. Click on each bubble to explore detailed analysis.
+              Analyze the AI market bubble using key economic indicators. Click on each bubble to explore detailed
+              analysis.
             </p>
           </div>
         </div>
@@ -67,26 +67,26 @@ const Index = () => {
       <div className="container mx-auto px-4 py-12">
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Market Consensus Bubble */}
-          <Card 
+          <Card
             className="p-8 bg-card border-border cursor-pointer hover:border-primary/50 transition-colors"
-            onClick={() => navigate('/market-consensus')}
+            onClick={() => navigate("/market-consensus")}
           >
             <BubbleVisualization
               score={marketScore}
               title="Market Consensus"
-              subtitle="Equal weight to all factors"
+              subtitle="Algorithm reflecting real-time market factors"
             />
           </Card>
 
           {/* User Analysis Bubble */}
-          <Card 
+          <Card
             className="p-8 bg-card border-border cursor-pointer hover:border-primary/50 transition-colors"
-            onClick={() => navigate('/user-analysis')}
+            onClick={() => navigate("/user-analysis")}
           >
             <BubbleVisualization
               score={userScore}
               title="Your Analysis"
-              subtitle="Custom factor weights"
+              subtitle="Assign your own weights in factors in estimating AI bubble"
             />
           </Card>
         </div>
