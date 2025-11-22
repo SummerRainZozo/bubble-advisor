@@ -83,7 +83,7 @@ export const CategoryControls = ({
 
   const getContribution = (category: Category) => {
     const categoryScore = getCategoryScore(category, true);
-    return (categoryScore * category.userWeight) / 100;
+    return categoryScore * category.userWeight;
   };
 
   const getTotalScore = () => {
