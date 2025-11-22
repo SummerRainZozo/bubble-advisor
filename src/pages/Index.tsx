@@ -187,19 +187,19 @@ const Index = () => {
 
       {/* Main Content - Two Bubbles */}
       <div className="container mx-auto px-4 py-12">
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className="grid lg:grid-cols-2 gap-8 lg:grid-rows-1 lg:auto-rows-fr">
           {/* Market Consensus Bubble */}
           <Card
-            className="p-8 bg-card border-border hover:border-primary/50 transition-colors overflow-hidden"
+            className="p-8 bg-card border-border hover:border-primary/50 transition-colors overflow-hidden flex flex-col"
           >
-            <div onClick={() => navigate("/market-consensus")} className="cursor-pointer">
+            <div onClick={() => navigate("/market-consensus")} className="cursor-pointer flex-1 flex flex-col">
               <BubbleVisualization
                 score={marketScore}
                 title="Market Consensus"
                 subtitle="Algorithm reflecting real-time market factors"
               />
             </div>
-            <div className="mt-6 pt-6 border-t border-border/50">
+            <div className="mt-6 pt-6 border-t border-border/50 flex-shrink-0">
               <p className="text-sm text-muted-foreground/90 leading-relaxed">
                 Market consensus reflects elevated valuations and strong sentiment across AI stocks. High scores in Sentiment & Hype (85%+) and Market Valuation (78%+) indicate significant bubble risk.
               </p>
@@ -208,16 +208,16 @@ const Index = () => {
 
           {/* User Analysis Bubble */}
           <Card
-            className="p-8 bg-card border-border hover:border-primary/50 transition-colors overflow-hidden"
+            className="p-8 bg-card border-border hover:border-primary/50 transition-colors overflow-hidden flex flex-col"
           >
-            <div onClick={() => navigate("/user-analysis")} className="cursor-pointer">
+            <div onClick={() => navigate("/user-analysis")} className="cursor-pointer flex-1 flex flex-col">
               <BubbleVisualization
                 score={userScore}
                 title="Your Analysis"
                 subtitle="Assign your own weights in factors in estimating AI bubble"
               />
             </div>
-            <div className="mt-6 pt-6 border-t border-border/50">
+            <div className="mt-6 pt-6 border-t border-border/50 flex-shrink-0">
               <p className="text-sm text-muted-foreground/90 leading-relaxed">
                 {generateInsight()}
               </p>
