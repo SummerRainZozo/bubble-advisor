@@ -13,12 +13,16 @@ const Index = () => {
   const calculateScore = (cats: Category[], useUserWeights: boolean = false) => {
     if (useUserWeights) {
       // User score calculation - matches UserAnalysis.tsx
+      const savedMode = localStorage.getItem('isAdvancedMode');
+      const isAdvancedMode = savedMode ? JSON.parse(savedMode) : false;
+      
       let totalScore = 0;
       let totalWeight = 0;
       
       cats.forEach(category => {
         const categoryScore = category.indexes.reduce((sum, index) => {
-          const indexValue = index.userValue !== undefined ? index.userValue : index.value;
+          // In normal mode, always use market values. In advanced mode, use user values if set
+          const indexValue = isAdvancedMode && index.userValue !== undefined ? index.userValue : index.value;
           return sum + indexValue;
         }, 0) / category.indexes.length;
         

@@ -10,17 +10,33 @@ import { useVoiceAgent } from "@/hooks/useVoiceAgent";
 
 const UserAnalysis = () => {
   const navigate = useNavigate();
-  const [categories, setCategories] = useState<Category[]>(CATEGORIES);
+  
+  // Initialize from localStorage if available
+  const getInitialCategories = () => {
+    const savedCategories = localStorage.getItem('userCategories');
+    if (savedCategories) {
+      try {
+        return JSON.parse(savedCategories);
+      } catch (e) {
+        console.error('Failed to load saved categories');
+      }
+    }
+    return CATEGORIES;
+  };
+  
+  const [categories, setCategories] = useState<Category[]>(getInitialCategories);
+  const [isAdvancedMode, setIsAdvancedMode] = useState(false);
   const [userScore, setUserScore] = useState(0);
   const { isListening, isProcessing, startRecording, stopRecording } = useVoiceAgent();
 
-  const calculateScore = (cats: Category[]) => {
+  const calculateScore = (cats: Category[], useAdvancedValues: boolean = false) => {
     let totalScore = 0;
     let totalWeight = 0;
     
     cats.forEach(category => {
       const categoryScore = category.indexes.reduce((sum, index) => {
-        const indexValue = index.userValue !== undefined ? index.userValue : index.value;
+        // In normal mode, always use market values. In advanced mode, use user values if set
+        const indexValue = useAdvancedValues && index.userValue !== undefined ? index.userValue : index.value;
         return sum + indexValue;
       }, 0) / category.indexes.length;
       
@@ -34,20 +50,20 @@ const UserAnalysis = () => {
   };
 
   useEffect(() => {
-    setUserScore(calculateScore(categories));
+    setUserScore(calculateScore(categories, isAdvancedMode));
     // Autosave to localStorage
     localStorage.setItem('userCategories', JSON.stringify(categories));
-  }, [categories]);
+    localStorage.setItem('isAdvancedMode', JSON.stringify(isAdvancedMode));
+  }, [categories, isAdvancedMode]);
 
-  // Load from localStorage on mount
+  // Load mode from localStorage on mount
   useEffect(() => {
-    const savedCategories = localStorage.getItem('userCategories');
-    if (savedCategories) {
+    const savedMode = localStorage.getItem('isAdvancedMode');
+    if (savedMode) {
       try {
-        const parsed = JSON.parse(savedCategories);
-        setCategories(parsed);
+        setIsAdvancedMode(JSON.parse(savedMode));
       } catch (e) {
-        console.error('Failed to load saved categories');
+        console.error('Failed to load saved mode');
       }
     }
   }, []);
@@ -160,6 +176,8 @@ const UserAnalysis = () => {
             onCategoryWeightChange={handleCategoryWeightChange}
             onIndexValueChange={handleIndexValueChange}
             onReset={handleReset}
+            isAdvancedMode={isAdvancedMode}
+            onModeChange={setIsAdvancedMode}
           />
         </div>
       </div>
