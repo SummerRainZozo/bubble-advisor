@@ -64,13 +64,13 @@ export const BubbleVisualization = ({
   const bubbleSize = 130 + score * 3.3;
 
   return (
-    <div className="relative flex flex-col items-center justify-between h-full p-8">
-      <div className="text-center mb-8">
+    <div className="relative flex flex-col items-center h-full p-8">
+      <div className="text-center mb-8 min-h-[80px] flex flex-col justify-center">
         <h2 className="text-2xl font-bold text-primary mb-2">{title}</h2>
         <p className="text-muted-foreground text-sm">{subtitle}</p>
       </div>
 
-      <div className="flex-1 flex items-center justify-center relative">
+      <div className="flex items-center justify-center relative min-h-[400px]">
         {/* Voice control button */}
         {isUserBubble && onVoiceStart && onVoiceStop && (
           <motion.div
@@ -234,7 +234,7 @@ export const BubbleVisualization = ({
         </AnimatePresence>
       </div>
 
-      <div className="w-full space-y-3 mt-8">
+      <div className="w-full space-y-3 mt-8 min-h-[140px]">
         <div className="flex justify-between items-center py-2 border-b border-border/50">
           <span className="text-muted-foreground text-sm font-medium">Bubble Score:</span>
           <span className="text-2xl font-bold text-primary">{score.toFixed(1)}</span>
