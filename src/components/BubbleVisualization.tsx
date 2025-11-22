@@ -1,11 +1,16 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Mic, MicOff } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface BubbleVisualizationProps {
-  score: number; // 0-100
+  score: number;
   title: string;
   subtitle: string;
   isUserBubble?: boolean;
+  onVoiceStart?: () => void;
+  onVoiceStop?: () => void;
+  isListening?: boolean;
 }
 
 export const BubbleVisualization = ({
@@ -13,17 +18,21 @@ export const BubbleVisualization = ({
   title,
   subtitle,
   isUserBubble = false,
+  onVoiceStart,
+  onVoiceStop,
+  isListening = false,
 }: BubbleVisualizationProps) => {
   const [prevScore, setPrevScore] = useState(score);
   const [animation, setAnimation] = useState<"pulse" | "inflate" | "shrink" | "burst" | null>("pulse");
 
   useEffect(() => {
     if (score !== prevScore) {
-      if (score > prevScore + 10) {
+      const diff = Math.abs(score - prevScore);
+      if (score > prevScore && diff > 5) {
         setAnimation("inflate");
-      } else if (score < prevScore - 10) {
+      } else if (score < prevScore && diff > 5) {
         setAnimation("shrink");
-      } else if (score > 90) {
+      } else if (score > 85) {
         setAnimation("burst");
       } else {
         setAnimation("pulse");
@@ -33,22 +42,23 @@ export const BubbleVisualization = ({
   }, [score, prevScore]);
 
   const getBurstRisk = (score: number) => {
-    if (score >= 80) return { label: "CRITICAL", color: "text-bubble-danger" };
-    if (score >= 65) return { label: "HIGH", color: "text-bubble-warning" };
-    if (score >= 45) return { label: "MODERATE", color: "text-yellow-500" };
+    if (score >= 85) return { label: "CRITICAL", color: "text-bubble-danger" };
+    if (score >= 70) return { label: "HIGH", color: "text-bubble-warning" };
+    if (score >= 50) return { label: "MODERATE", color: "text-yellow-500" };
     return { label: "LOW", color: "text-bubble-success" };
   };
 
   const getTimeEstimate = (score: number) => {
-    if (score >= 80) return "< 30 days";
-    if (score >= 65) return "30-90 days";
-    if (score >= 45) return "90-180 days";
+    if (score >= 85) return "< 30 days";
+    if (score >= 70) return "30-90 days";
+    if (score >= 50) return "90-180 days";
     return "12+ months";
   };
 
   const risk = getBurstRisk(score);
-  const cappedScore = Math.min(score, 100);
-  const bubbleSize = Math.max(140, Math.min(320, 140 + (cappedScore * 1.8)));
+  // Scale bubble size based on actual score (no capping)
+  // Min size: 100px at score 0, Max size: 380px at score 100
+  const bubbleSize = Math.max(100, Math.min(380, 100 + (score * 2.8)));
 
   return (
     <div className="relative flex flex-col items-center justify-between h-full p-8">
@@ -58,10 +68,33 @@ export const BubbleVisualization = ({
       </div>
 
       <div className="flex-1 flex items-center justify-center relative">
+        {/* Voice control button */}
+        {isUserBubble && onVoiceStart && onVoiceStop && (
+          <motion.div
+            className="absolute top-0 right-0 z-10"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+          >
+            <Button
+              onClick={isListening ? onVoiceStop : onVoiceStart}
+              variant={isListening ? "default" : "outline"}
+              size="icon"
+              className={`rounded-full ${isListening ? "animate-pulse" : ""}`}
+            >
+              {isListening ? (
+                <MicOff className="w-5 h-5" />
+              ) : (
+                <Mic className="w-5 h-5" />
+              )}
+            </Button>
+          </motion.div>
+        )}
+
         <AnimatePresence mode="wait">
           <motion.div
             key={score}
-            className="relative"
+            className="relative cursor-pointer"
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ 
               scale: 1, 
@@ -85,6 +118,7 @@ export const BubbleVisualization = ({
               width: bubbleSize,
               height: bubbleSize,
             }}
+            onClick={isUserBubble && !isListening ? onVoiceStart : undefined}
           >
             {/* Outer glow effect */}
             <motion.div 
@@ -186,7 +220,7 @@ export const BubbleVisualization = ({
                   }}
                   transition={{ duration: 2, repeat: Infinity }}
                 >
-                  {Math.round(cappedScore)}
+                  {Math.round(score)}
                 </motion.div>
                 <motion.div 
                   className="text-xs text-foreground/60 uppercase tracking-wider mt-2 font-medium"
@@ -203,8 +237,8 @@ export const BubbleVisualization = ({
 
       <div className="w-full space-y-3 mt-8">
         <div className="flex justify-between items-center py-2 border-b border-border/50">
-          <span className="text-muted-foreground text-sm font-medium">Bubble Size:</span>
-          <span className="text-2xl font-bold text-primary">{cappedScore.toFixed(1)}%</span>
+          <span className="text-muted-foreground text-sm font-medium">Bubble Score:</span>
+          <span className="text-2xl font-bold text-primary">{score.toFixed(1)}</span>
         </div>
         <div className="flex justify-between items-center py-2 border-b border-border/50">
           <span className="text-muted-foreground text-sm font-medium">Burst Risk:</span>
@@ -212,7 +246,7 @@ export const BubbleVisualization = ({
         </div>
         <div className="flex justify-between items-center py-2">
           <span className="text-muted-foreground text-sm font-medium">Est. Time to Burst:</span>
-          <span className="text-base font-semibold text-foreground">{getTimeEstimate(cappedScore)}</span>
+          <span className="text-base font-semibold text-foreground">{getTimeEstimate(score)}</span>
         </div>
       </div>
     </div>
