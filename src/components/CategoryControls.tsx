@@ -239,9 +239,49 @@ export const CategoryControls = ({
                   )}
                 </AnimatePresence>
 
-                {/* Normal Mode: Category Weight Slider */}
+                {/* Normal Mode: Category Score and Weight Sliders */}
                 {!showAdvanced && (
                   <div className="space-y-4">
+                    {/* Category Score Slider */}
+                    <div>
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-sm text-muted-foreground">
+                          Category Score: {(category.userCategoryScore ?? getMarketCategoryScore(category)).toFixed(0)}
+                        </span>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <Info className="w-3 h-3 text-muted-foreground" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Your view on this category (0 = Very Low Risk, 100 = Maximum Bubble Risk)</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
+                      <div className="relative">
+                        <Slider
+                          value={[category.userCategoryScore ?? getMarketCategoryScore(category)]}
+                          onValueChange={([value]) => {
+                            if (onCategoryScoreChange) {
+                              onCategoryScoreChange(category.id, value);
+                            }
+                          }}
+                          min={0}
+                          max={100}
+                          step={1}
+                          className="mb-2"
+                          disabled={readOnly}
+                        />
+                        <div className="flex justify-between text-xs text-muted-foreground">
+                          <span>0</span>
+                          <span>Market: {getMarketCategoryScore(category).toFixed(0)}</span>
+                          <span>100</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Category Weight Slider */}
                     <div>
                       <div className="flex justify-between items-center mb-2">
                         <span className="text-sm text-muted-foreground">
@@ -253,7 +293,7 @@ export const CategoryControls = ({
                               <Info className="w-3 h-3 text-muted-foreground" />
                             </TooltipTrigger>
                             <TooltipContent>
-                              <p>Adjust category importance (0% = Ignore, 100% = Maximum)</p>
+                              <p>Category importance (0% = Ignore, 100% = Maximum Impact)</p>
                             </TooltipContent>
                           </Tooltip>
                         </TooltipProvider>
