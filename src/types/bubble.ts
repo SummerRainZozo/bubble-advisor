@@ -24,8 +24,8 @@ export const CATEGORIES: Category[] = [
     name: "Market Valuation",
     description: "Price metrics vs historical norms",
     explanation: "Market valuation measures how expensive AI stocks are relative to their earnings and revenue. High valuations (85%+) suggest investors are pricing in significant future growth, potentially creating bubble conditions if expectations aren't met. Current market consensus shows elevated valuations near historical peaks, indicating strong optimism but also increased risk.",
-    marketWeight: 25,
-    userWeight: 25,
+    marketWeight: 50,
+    userWeight: 50,
     indexes: [
       {
         id: "pe-ratio",
@@ -66,8 +66,8 @@ export const CATEGORIES: Category[] = [
     name: "Sentiment & Hype",
     description: "Market excitement and media coverage",
     explanation: "Sentiment measures the emotional and psychological enthusiasm around AI investments. Extremely high sentiment (90%+) often precedes corrections as hype exceeds reality. Current levels show strong excitement with media coverage near peak levels, suggesting we're in the euphoric phase where retail participation surges.",
-    marketWeight: 20,
-    userWeight: 20,
+    marketWeight: 50,
+    userWeight: 50,
     indexes: [
       {
         id: "media-mentions",
@@ -116,8 +116,8 @@ export const CATEGORIES: Category[] = [
     name: "Positioning & Flows",
     description: "Investor positioning and capital flows",
     explanation: "Positioning tracks where investors are actually putting their money. Extreme positioning (80%+) can signal overcrowding and vulnerability to sharp reversals. Current flows show strong institutional and retail commitment, but this concentration increases systemic risk if sentiment shifts.",
-    marketWeight: 18,
-    userWeight: 18,
+    marketWeight: 50,
+    userWeight: 50,
     indexes: [
       {
         id: "fund-flows",
@@ -158,8 +158,8 @@ export const CATEGORIES: Category[] = [
     name: "Macro & Liquidity",
     description: "Economic environment and capital availability",
     explanation: "Macro conditions determine how much money is available to chase assets. Low rates and high liquidity (below 60% on fear indicators) fuel speculation. Current conditions show moderate support with some caution, but any liquidity tightening could trigger rapid derating.",
-    marketWeight: 22,
-    userWeight: 22,
+    marketWeight: 50,
+    userWeight: 50,
     indexes: [
       {
         id: "interest-rates",
@@ -200,8 +200,8 @@ export const CATEGORIES: Category[] = [
     name: "AI Infra Cycles & Profitability",
     description: "Business fundamentals and infrastructure",
     explanation: "Fundamentals show whether AI businesses can justify their valuations through real profits and growth. Strong fundamentals (70%+) can support high valuations, but if revenue growth slows or margins compress, the market could reprice aggressively. Current metrics show strong growth but mixed profitability.",
-    marketWeight: 15,
-    userWeight: 15,
+    marketWeight: 50,
+    userWeight: 50,
     indexes: [
       {
         id: "revenue-growth",
