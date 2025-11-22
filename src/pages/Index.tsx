@@ -46,19 +46,41 @@ const Index = () => {
     // Calculate market score
     setMarketScore(calculateScore(categories, false));
 
-    // Load user categories from localStorage
-    const savedUserCategories = localStorage.getItem("userCategories");
-    if (savedUserCategories) {
-      try {
-        const parsed = JSON.parse(savedUserCategories);
-        setUserScore(calculateScore(parsed, true));
-      } catch (e) {
+    // Load user categories from localStorage and calculate user score
+    const loadUserScore = () => {
+      const savedUserCategories = localStorage.getItem("userCategories");
+      if (savedUserCategories) {
+        try {
+          const parsed = JSON.parse(savedUserCategories);
+          setUserScore(calculateScore(parsed, true));
+        } catch (e) {
+          setUserScore(calculateScore(categories, true));
+        }
+      } else {
         setUserScore(calculateScore(categories, true));
       }
-    } else {
-      setUserScore(calculateScore(categories, true));
-    }
+    };
+
+    loadUserScore();
   }, [categories]);
+
+  // Reload user score when window regains focus (user returns to page)
+  useEffect(() => {
+    const handleFocus = () => {
+      const savedUserCategories = localStorage.getItem("userCategories");
+      if (savedUserCategories) {
+        try {
+          const parsed = JSON.parse(savedUserCategories);
+          setUserScore(calculateScore(parsed, true));
+        } catch (e) {
+          console.error('Failed to load user score on focus');
+        }
+      }
+    };
+
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, []);
 
   return (
     <div className="min-h-screen bg-background dark">
