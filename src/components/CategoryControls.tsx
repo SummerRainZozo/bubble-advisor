@@ -177,7 +177,7 @@ export const CategoryControls = ({
                   </div>
                   <div className="text-right">
                     <div className="text-2xl font-bold text-primary">
-                      {category.userWeight.toFixed(0)}%
+                      {showAdvanced ? getCategoryScore(category, true).toFixed(0) : category.userWeight.toFixed(0)}
                     </div>
                     <div className="text-xs text-muted-foreground">
                       Market: {getMarketCategoryScore(category).toFixed(0)}
@@ -276,16 +276,13 @@ export const CategoryControls = ({
                           <span className="text-xl font-bold text-primary">
                             {contributionPercentage.toFixed(1)}%
                           </span>
-                          <span className="text-xs text-muted-foreground ml-1">
-                            ({contribution.toFixed(1)} pts)
-                          </span>
                         </div>
                       </div>
                       
-                      <div className="space-y-1">
+                       <div className="space-y-1">
                         <div className="flex justify-between text-xs text-muted-foreground">
                           <span>Relative Impact</span>
-                          <span>{contributionPercentage.toFixed(0)}% of total</span>
+                          <span>{contributionPercentage.toFixed(1)}%</span>
                         </div>
                         <div className="h-2 bg-secondary/50 rounded-full overflow-hidden">
                           <motion.div
