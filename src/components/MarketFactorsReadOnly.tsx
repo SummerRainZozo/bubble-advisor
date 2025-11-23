@@ -1,13 +1,17 @@
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Category } from "@/types/bubble";
 import { motion } from "framer-motion";
-import { TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, ChevronRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface MarketFactorsReadOnlyProps {
   categories: Category[];
 }
 
 export const MarketFactorsReadOnly = ({ categories }: MarketFactorsReadOnlyProps) => {
+  const navigate = useNavigate();
+  
   const getValueIndicator = (value: number) => {
     if (value >= 70) return { icon: TrendingUp, color: "text-bubble-danger", label: "High Risk" };
     if (value >= 50) return { icon: Minus, color: "text-bubble-warning", label: "Elevated" };
@@ -36,7 +40,7 @@ export const MarketFactorsReadOnly = ({ categories }: MarketFactorsReadOnlyProps
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: idx * 0.1 }}
             >
-              <Card className="p-6 bg-card border-border">
+              <Card className="p-6 bg-card border-border hover:border-primary/30 transition-all">
                 <div className="space-y-4">
                   {/* Category Header */}
                   <div className="flex items-start justify-between">
@@ -64,77 +68,42 @@ export const MarketFactorsReadOnly = ({ categories }: MarketFactorsReadOnlyProps
                     </div>
                   </div>
 
-                  {/* Category Explanation */}
-                  <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
-                    <p className="text-sm text-foreground leading-relaxed">
-                      {category.explanation}
-                    </p>
-                  </div>
-
-                  {/* Individual Factors */}
-                  <div className="space-y-3 pt-2">
+                  {/* Contributing Factors - Simple List */}
+                  <div className="space-y-2">
                     <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
                       Contributing Factors
                     </div>
-                    {category.indexes.map((index) => {
-                      const indexIndicator = getValueIndicator(index.value);
-                      const IndexIcon = indexIndicator.icon;
+                    <div className="grid grid-cols-2 gap-2">
+                      {category.indexes.map((index) => {
+                        const indexIndicator = getValueIndicator(index.value);
+                        const IndexIcon = indexIndicator.icon;
 
-                      return (
-                        <div key={index.id} className="space-y-2">
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-1">
-                                <h4 className="text-sm font-medium text-foreground">
-                                  {index.name}
-                                </h4>
-                                <IndexIcon className={`w-3 h-3 ${indexIndicator.color}`} />
-                              </div>
-                              <p className="text-xs text-muted-foreground">
-                                {index.description}
-                              </p>
+                        return (
+                          <div key={index.id} className="flex items-center justify-between p-2 bg-secondary/30 rounded">
+                            <div className="flex items-center gap-2">
+                              <IndexIcon className={`w-3 h-3 ${indexIndicator.color}`} />
+                              <span className="text-xs font-medium text-foreground">
+                                {index.name}
+                              </span>
                             </div>
-                            <div className="text-right ml-4">
-                              <div className="text-lg font-bold text-primary">
-                                {index.value.toFixed(0)}
-                              </div>
-                            </div>
+                            <span className="text-sm font-bold text-primary">
+                              {index.value.toFixed(0)}
+                            </span>
                           </div>
-                          
-                          {/* Visual indicator bar */}
-                          <div className="h-1.5 bg-secondary/50 rounded-full overflow-hidden">
-                            <motion.div
-                              className={`h-full ${
-                                index.value >= 70 ? 'bg-bubble-danger' :
-                                index.value >= 50 ? 'bg-bubble-warning' :
-                                'bg-bubble-safe'
-                              }`}
-                              initial={{ width: 0 }}
-                              animate={{ width: `${index.value}%` }}
-                              transition={{ duration: 0.8, delay: idx * 0.1 + 0.3 }}
-                            />
-                          </div>
-
-                          {/* Factor Explanation */}
-                          <div className="p-3 bg-secondary/30 rounded-lg border border-border/50">
-                            <p className="text-xs text-foreground leading-relaxed">
-                              <span className="font-semibold">Why this matters:</span> {index.explanation}
-                            </p>
-                            <div className="mt-2 pt-2 border-t border-border/50">
-                              <p className="text-xs text-muted-foreground">
-                                <span className="font-semibold">Current level ({index.value}):</span>{" "}
-                                {index.value >= 70 
-                                  ? "Indicates elevated bubble risk in this area. Historical patterns suggest heightened vulnerability."
-                                  : index.value >= 50
-                                  ? "Shows moderate concerns. Worth monitoring but not at critical levels yet."
-                                  : "Remains within healthy ranges. No immediate concerns for bubble formation."}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      })}
+                    </div>
                   </div>
+
+                  {/* Learn More Button */}
+                  <Button
+                    variant="outline"
+                    className="w-full gap-2"
+                    onClick={() => navigate(`/category/${category.id}`)}
+                  >
+                    Learn More About {category.name}
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
                 </div>
               </Card>
             </motion.div>

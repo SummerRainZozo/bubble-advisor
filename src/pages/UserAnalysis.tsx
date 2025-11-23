@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { BubbleVisualization } from "@/components/BubbleVisualization";
 import { CategoryControls } from "@/components/CategoryControls";
+import { ScenarioAnalysis } from "@/components/ScenarioAnalysis";
+import { InvestmentRecommendation } from "@/components/InvestmentRecommendation";
 import { CATEGORIES, Category } from "@/types/bubble";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -27,7 +29,23 @@ const UserAnalysis = () => {
   const [categories, setCategories] = useState<Category[]>(getInitialCategories);
   const [isAdvancedMode, setIsAdvancedMode] = useState(false);
   const [userScore, setUserScore] = useState(0);
+  const [marketScore, setMarketScore] = useState(0);
   const { isListening, isProcessing, startRecording, stopRecording } = useVoiceAgent();
+
+  // Calculate market consensus score
+  const calculateMarketScore = () => {
+    let totalScore = 0;
+    let totalWeight = 0;
+
+    CATEGORIES.forEach((category) => {
+      const categoryScore =
+        category.indexes.reduce((sum, index) => sum + index.value, 0) / category.indexes.length;
+      totalScore += categoryScore * category.marketWeight;
+      totalWeight += category.marketWeight;
+    });
+
+    return totalWeight > 0 ? Math.min(100, totalScore / totalWeight) : 0;
+  };
 
   const calculateScore = (cats: Category[], useAdvancedValues: boolean = false) => {
     let totalScore = 0;
@@ -62,6 +80,7 @@ const UserAnalysis = () => {
 
   useEffect(() => {
     setUserScore(calculateScore(categories, isAdvancedMode));
+    setMarketScore(calculateMarketScore());
     // Autosave to localStorage
     localStorage.setItem('userCategories', JSON.stringify(categories));
     localStorage.setItem('isAdvancedMode', JSON.stringify(isAdvancedMode));
@@ -166,21 +185,7 @@ const UserAnalysis = () => {
           <Card className="p-8 bg-card border-border">
             <div className="mb-4 text-center">
               <div className="text-sm text-muted-foreground">
-                Market Consensus: <span className="font-semibold text-primary">{(() => {
-                  // Calculate market consensus score using same formula as Index.tsx
-                  let totalScore = 0;
-                  let totalWeight = 0;
-
-                  CATEGORIES.forEach((category) => {
-                    const categoryScore =
-                      category.indexes.reduce((sum, index) => sum + index.value, 0) / category.indexes.length;
-
-                    totalScore += categoryScore * category.marketWeight;
-                    totalWeight += category.marketWeight;
-                  });
-
-                  return totalWeight > 0 ? Math.min(100, totalScore / totalWeight).toFixed(1) : '0.0';
-                })()}</span>
+                Market Consensus: <span className="font-semibold text-primary">{marketScore.toFixed(1)}</span>
               </div>
             </div>
             <BubbleVisualization
@@ -196,7 +201,7 @@ const UserAnalysis = () => {
         </div>
 
         {/* User Controls - Fully Editable */}
-        <div>
+        <div className="mb-12">
           <CategoryControls
             categories={categories}
             onCategoryWeightChange={handleCategoryWeightChange}
@@ -205,6 +210,24 @@ const UserAnalysis = () => {
             onReset={handleReset}
             isAdvancedMode={isAdvancedMode}
             onModeChange={setIsAdvancedMode}
+          />
+        </div>
+
+        {/* Scenario Analysis */}
+        <div className="mb-12">
+          <ScenarioAnalysis
+            categories={categories}
+            userScore={userScore}
+            marketScore={marketScore}
+          />
+        </div>
+
+        {/* Investment Recommendations */}
+        <div className="mb-12">
+          <InvestmentRecommendation
+            categories={categories}
+            userScore={userScore}
+            marketScore={marketScore}
           />
         </div>
       </div>
