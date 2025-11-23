@@ -36,8 +36,19 @@ export const CategoryControls = ({
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
   const [showExplanations, setShowExplanations] = useState<Set<string>>(new Set());
   const [showCategoryExplanations, setShowCategoryExplanations] = useState<Set<string>>(new Set());
+  const [showNormalSliders, setShowNormalSliders] = useState<Set<string>>(new Set());
   
   const showAdvanced = isAdvancedMode;
+
+  const toggleNormalSliders = (categoryId: string) => {
+    const newShowSliders = new Set(showNormalSliders);
+    if (newShowSliders.has(categoryId)) {
+      newShowSliders.delete(categoryId);
+    } else {
+      newShowSliders.add(categoryId);
+    }
+    setShowNormalSliders(newShowSliders);
+  };
 
   const toggleCategory = (categoryId: string) => {
     const newExpanded = new Set(expandedCategories);
@@ -120,6 +131,16 @@ export const CategoryControls = ({
 
   return (
     <div className="space-y-6">
+      {/* Explanation Section */}
+      {!readOnly && !showAdvanced && (
+        <Card className="p-4 bg-primary/5 border-primary/20">
+          <h3 className="text-sm font-semibold text-foreground mb-2">How Normal Controls Work</h3>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            In Normal Controls mode, you can adjust two things for each category: <strong>Category Score</strong> (your view on the risk level, 0-100) and <strong>Weight</strong> (how important this category is to the overall bubble calculation). Your final bubble index is calculated by multiplying each category's score by its weight, then averaging across all categories. This gives you simplified control while maintaining precision in your analysis.
+          </p>
+        </Card>
+      )}
+
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-primary">Market Factors</h2>
@@ -164,6 +185,7 @@ export const CategoryControls = ({
           const isExpanded = expandedCategories.has(category.id);
           const showExplanation = showExplanations.has(category.id);
           const showCategoryExplanation = showCategoryExplanations.has(category.id);
+          const showSliders = showNormalSliders.has(category.id);
           const contribution = getContribution(category);
           const totalContribution = getTotalContribution();
           const contributionPercentage = totalContribution > 0 ? (contribution / totalContribution) * 100 : 0;
@@ -196,28 +218,44 @@ export const CategoryControls = ({
                       {category.description}
                     </p>
                   </div>
-                  <div className="text-right">
-                    <div className="text-2xl font-bold text-primary">
-                      {showAdvanced ? getCategoryScore(category, true).toFixed(0) : category.userWeight.toFixed(0)}
+                  <div className="text-right flex items-center gap-2">
+                    <div>
+                      <div className="text-2xl font-bold text-primary">
+                        {showAdvanced ? getCategoryScore(category, true).toFixed(0) : category.userWeight.toFixed(0)}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        Market: {getMarketCategoryScore(category).toFixed(0)}
+                      </div>
                     </div>
-                    <div className="text-xs text-muted-foreground">
-                      Market: {getMarketCategoryScore(category).toFixed(0)}
-                    </div>
+                    {!showAdvanced && !readOnly && (
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="ml-2"
+                        onClick={() => toggleNormalSliders(category.id)}
+                      >
+                        {showSliders ? (
+                          <ChevronUp className="w-4 h-4" />
+                        ) : (
+                          <ChevronDown className="w-4 h-4" />
+                        )}
+                      </Button>
+                    )}
+                    {showAdvanced && (
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="ml-2"
+                        onClick={() => toggleCategory(category.id)}
+                      >
+                        {isExpanded ? (
+                          <ChevronUp className="w-4 h-4" />
+                        ) : (
+                          <ChevronDown className="w-4 h-4" />
+                        )}
+                      </Button>
+                    )}
                   </div>
-                  {showAdvanced && (
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="ml-2"
-                      onClick={() => toggleCategory(category.id)}
-                    >
-                      {isExpanded ? (
-                        <ChevronUp className="w-4 h-4" />
-                      ) : (
-                        <ChevronDown className="w-4 h-4" />
-                      )}
-                    </Button>
-                  )}
                 </div>
 
                 {/* Category Explanation */}
@@ -240,8 +278,14 @@ export const CategoryControls = ({
                 </AnimatePresence>
 
                 {/* Normal Mode: Category Score and Weight Sliders */}
-                {!showAdvanced && (
-                  <div className="space-y-4">
+                {!showAdvanced && showSliders && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="space-y-4 overflow-hidden"
+                  >
                     {/* Category Score Slider */}
                     <div>
                       <div className="flex justify-between items-center mb-2">
@@ -380,7 +424,7 @@ export const CategoryControls = ({
                         )}
                       </AnimatePresence>
                     </div>
-                  </div>
+                  </motion.div>
                 )}
               </div>
 

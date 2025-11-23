@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import MarketConsensus from "./pages/MarketConsensus";
 import UserAnalysis from "./pages/UserAnalysis";
+import CategoryDetail from "./pages/CategoryDetail";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -20,6 +21,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/market-consensus" element={<MarketConsensus />} />
           <Route path="/user-analysis" element={<UserAnalysis />} />
+          <Route path="/category/:categoryId" element={<CategoryDetail />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
